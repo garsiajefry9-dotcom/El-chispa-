@@ -3,139 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EL PREDICADOR | JUICIO FINAL</title>
+    <title>EL PREDICADOR | HISTORIAL DE FALLOS</title>
     <style>
-        :root { --bg: #000; --red: #ff0000; --gray: #333; --text: #00ff41; }
+        :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
         body { 
-            background: var(--bg); color: var(--text); font-family: 'Courier New', monospace;
-            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
-            text-transform: uppercase; overflow: hidden;
+            background: var(--bg); color: var(--main); font-family: 'Courier New', monospace;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+            text-transform: uppercase; overflow-x: hidden;
         }
-        /* Efecto de estática y líneas de TV */
-        body::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
-            pointer-events: none; z-index: 10;
+        body::after {
+            content: ""; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%), linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01));
+            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100;
         }
-        .monitor {
-            width: 90%; max-width: 450px; border: 2px solid var(--text); padding: 25px;
-            background: rgba(10, 10, 10, 0.9); box-shadow: 0 0 15px var(--text);
-            position: relative; z-index: 5;
+        .frame { 
+            width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; 
+            background: #050505; box-shadow: 0 0 15px rgba(0,255,65,0.2); margin: 20px;
         }
-        .header { border-bottom: 2px solid var(--text); margin-bottom: 15px; padding-bottom: 10px; font-weight: bold; }
-        .marca-fracaso { color: var(--red); font-size: 0.8rem; margin: 10px 0; border: 1px solid var(--red); padding: 5px; display: none; }
-        
-        #display-mision { 
-            min-height: 80px; border: 1px dashed var(--text); margin: 20px 0;
-            display: flex; align-items: center; justify-content: center; padding: 15px; text-align: center;
-        }
-        #counter { font-size: 3rem; color: var(--red); display: none; margin: 10px 0; }
-        
-        .btn { 
-            width: 100%; padding: 15px; border: none; font-family: inherit; font-weight: bold;
-            cursor: pointer; text-transform: uppercase; transition: 0.1s;
-        }
-        .btn-penitencia { background: var(--text); color: #000; }
-        .btn-listo { background: var(--bg); color: var(--text); border: 2px solid var(--text); display: none; }
-        .btn:active { filter: invert(1); }
-
-        /* Animación de Susto */
-        .panic { animation: shake 0.1s infinite; background: var(--red) !important; color: #000 !important; }
-        @keyframes shake { 0%{transform: translate(2px,2px)} 50%{transform: translate(-2px,-2px)} 100%{transform: translate(2px,-2px)} }
+        .marca { color: var(--fail); border: 1px solid var(--fail); padding: 5px; margin: 10px 0; font-size: 0.7rem; display: none; }
+        #msg { height: 100px; border: 1px dashed var(--main); display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; margin: 15px 0; font-weight: bold; }
+        #timer { font-size: 3.5rem; color: var(--fail); display: none; text-shadow: 0 0 10px var(--fail); }
+        .btn { width: 100%; padding: 15px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; }
+        .btn-p { background: var(--main); color: #000; }
+        .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
+        .historial { margin-top: 20px; border-top: 1px solid var(--main); padding-top: 10px; font-size: 0.7rem; }
+        .falla-item { color: var(--fail); margin-bottom: 3px; border-left: 2px solid var(--fail); padding-left: 5px; }
     </style>
 </head>
-<body id="bg-view">
+<body>
 
-<div class="monitor" id="ui">
-    <div class="header">
-        <div>EL PREDICADOR [V.01]</div>
-        <div style="font-size: 0.7rem; color: #888;">ESTADO: OBSERVANDO...</div>
-    </div>
-
-    <div id="marca" class="marca-fracaso">MARCA ACTUAL: <span id="marca-txt">NINGUNA</span></div>
-
-    <select id="cat-debilidad" style="width:100%; background:#000; color:var(--text); border:1px solid var(--text); padding:8px; margin-bottom:15px;">
-        <option value="p">DEBILIDAD: PEREZA</option>
-        <option value="f">DEBILIDAD: FÍSICA</option>
-        <option value="m">DEBILIDAD: MENTAL</option>
+<div class="frame" id="ui">
+    <div style="font-weight: 900; border-bottom: 1px solid var(--main); padding-bottom: 5px;">EL PREDICADOR [LOG DE INCOMPETENCIA]</div>
+    <div id="m" class="marca">ESTADO: <span id="mt">NINGUNO</span></div>
+    
+    <select id="s" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); margin-top: 15px; padding: 5px;">
+        <option value="p">PEREZA CRÓNICA</option>
+        <option value="f">DEBILIDAD FÍSICA</option>
+        <option value="m">BLOQUEO MENTAL</option>
     </select>
 
-    <div id="display-mision">¿TE ATREVES A SER JUZGADO?</div>
-    
-    <center><div id="counter">00:00</div></center>
+    <div id="msg">SISTEMA LISTO. TE ESTOY OBSERVANDO.</div>
+    <center><div id="timer">00:00</div></center>
 
-    <button id="btn-start" class="btn btn-penitencia">ASUMIR PENITENCIA</button>
-    <button id="btn-done" class="btn btn-listo">HE TERMINADO (SI ES QUE ES CIERTO)</button>
+    <button id="b1" class="btn btn-p">ASUMIR PENITENCIA</button>
+    <button id="b2" class="btn btn-l">MARCAR COMO CUMPLIDO</button>
+
+    <div class="historial">
+        <div style="margin-bottom: 5px; color: #888;">REGISTRO DE FALLOS RECIENTES:</div>
+        <div id="log-lista">NINGUNO. POR AHORA.</div>
+    </div>
 </div>
 
 <script>
-    const penitencias = {
-        p: ["LIMPIA TU DESASTRE (MESA)", "TIRA 3 OBJETOS INÚTILES", "ORDENA TUS ZAPATOS"],
-        f: ["20 FLEXIONES AHORA", "PLANCHA HASTA QUE TIEMBLES", "40 SENTADILLAS"],
-        m: ["LEE 5 PÁGINAS", "ESCRIBE TU META DE HOY", "BORRA 1 APP BASURA"]
+    const pen = {
+        p: ["LIMPIA TU MESA AHORA", "TIRA LA BASURA", "ORDENA TU ROPA"],
+        f: ["25 FLEXIONES", "1 MIN PLANCHA", "40 SENTADILLAS"],
+        m: ["LEE 5 PÁGINAS", "ESCRIBE TUS METAS", "BORRA 1 APP BASURA"]
     };
 
-    let racha = localStorage.getItem('pred_racha') || 0;
-    let marca = localStorage.getItem('pred_marca') || "";
-    let startTime, interval;
+    let st, iv, marca = localStorage.getItem('p_m') || "";
+    let fallos = JSON.parse(localStorage.getItem('p_fallos')) || [];
 
-    if(marca) {
-        document.getElementById('marca').style.display = 'block';
-        document.getElementById('marca-txt').innerText = marca;
-    }
-
-    const bStart = document.getElementById('btn-start');
-    const bDone = document.getElementById('btn-done');
-    const display = document.getElementById('display-mision');
-    const counterUI = document.getElementById('counter');
-
-    bStart.onclick = () => {
-        const hora = new Date().getHours();
-        if (hora >= 23 || hora < 5) {
-            ejecutarSusto(); return;
+    function actualizarInterfaz() {
+        if(marca) { document.getElementById('m').style.display='block'; document.getElementById('mt').innerText=marca; }
+        const lista = document.getElementById('log-lista');
+        if(fallos.length > 0) {
+            lista.innerHTML = fallos.map(f => `<div class="falla-item"> > FALLO: ${f.t}s - ${f.d}</div>`).join('');
         }
+    }
+    actualizarInterfaz();
 
-        const c = document.getElementById('cat-debilidad').value;
-        display.innerText = penitencias[c][Math.floor(Math.random()*3)];
-        
-        bStart.style.display = 'none';
-        bDone.style.display = 'block';
-        counterUI.style.display = 'block';
-
-        let seg = 0;
-        startTime = Date.now();
-        interval = setInterval(() => {
-            seg++;
-            let m = Math.floor(seg/60), s = seg%60;
-            counterUI.innerText = (m<10?'0':'')+m + ":" + (s<10?'0':'')+s;
+    document.getElementById('b1').onclick = function() {
+        if (new Date().getHours() >= 23 || new Date().getHours() < 5) {
+            alert("NOCHE. RACHA ELIMINADA."); localStorage.clear(); location.reload(); return;
+        }
+        document.getElementById('msg').innerText = pen[document.getElementById('s').value][Math.floor(Math.random()*3)];
+        this.style.display='none';
+        document.getElementById('b2').style.display='block';
+        document.getElementById('timer').style.display='block';
+        let s = 0; st = Date.now();
+        iv = setInterval(() => { 
+            s++; let min = Math.floor(s/60), seg = s%60;
+            document.getElementById('timer').innerText = (min<10?'0':'')+min+":"+(seg<10?'0':'')+seg;
         }, 1000);
     };
 
-    bDone.onclick = () => {
-        clearInterval(interval);
-        let totalTime = Math.floor((Date.now() - startTime) / 1000);
-        let insulto = "";
-
-        if (totalTime > 60) {
-            insulto = `\nDURASTE ${totalTime} SEGUNDOS. HASTA UN CARACOL TIENE MÁS VOLUNTAD QUE TÚ.`;
-            localStorage.setItem('pred_marca', "LENTO E INEFICIENTE");
+    document.getElementById('b2').onclick = function() {
+        clearInterval(iv);
+        let t = Math.floor((Date.now() - st) / 1000);
+        if (t > 60) {
+            localStorage.setItem('p_m', "LENTO E INEFICIENTE");
+            fallos.unshift({t: t, d: new Date().toLocaleTimeString()});
+            if(fallos.length > 5) fallos.pop();
+            localStorage.setItem('p_fallos', JSON.stringify(fallos));
+            alert(`TARDATE MÁS. ${t}s ES UNA VERGÜENZA.`);
         } else {
-            insulto = `\n${totalTime} SEGUNDOS... POR FIN HACES ALGO RÁPIDO EN TU VIDA.`;
-            localStorage.removeItem('pred_marca');
+            localStorage.removeItem('p_m');
+            alert(`CUMPLIDO EN ${t}s. ESTÁS A SALVO.`);
         }
-
-        alert("PENITENCIA REGISTRADA." + insulto);
         location.reload();
     };
-
-    function ejecutarSusto() {
-        document.getElementById('bg-view').classList.add('panic');
-        document.getElementById('ui').style.opacity = "0";
-        setTimeout(() => {
-            alert("LA OSCURIDAD NO ES PARA PENITENCIAS. ES PARA DESCANSAR. LARGO DE AQUÍ.");
-            location.reload();
-        }, 500);
-    }
 </script>
 </body>
 </html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Chispa Pro</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --card: #16161a;
+            --accent: #00f2ff;
+            --secondary: #ff007a;
+            --text: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid #2d2d35;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .racha-badge {
+            background: rgba(255, 0, 122, 0.1);
+            color: var(--secondary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 1px solid var(--secondary);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        /* Círculo de Revelación */
+        .reveal-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 4px dashed #2d2d35;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .reveal-circle.active {
+            border-style: solid;
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        #timer {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            display: none;
+        }
+
+        #instruccion {
+            font-size: 1.1rem;
+            padding: 10px;
+            font-weight: 500;
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, var(--accent), #0072ff);
+            color: #000;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn-main:active { transform: scale(0.95); }
+
+        .btn-done {
+            background: var(--secondary);
+            margin-top: 15px;
+            display: none;
+            color: white;
+        }
+
+        /* Animaciones */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse { animation: pulse 2s infinite; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>El Chispa</h1>
+        <div class="racha-badge">🔥 <span id="racha-count">0</span> DÍAS</div>
+    </div>
+
+    <div id="revelador" class="reveal-circle pulse" onclick="iniciarMision()">
+        <span id="click-text">TOCA PARA<br>REVELAR</span>
+        <div id="timer">05:00</div>
+    </div>
+
+    <div id="instruccion">¿Listo para dejar de procastinar?</div>
+
+    <button id="btn-revelar" class="btn-main" onclick="iniciarMision()">¡DAME UNA CHISPA!</button>
+    <button id="btn-hecho" class="btn-main btn-done" onclick="completarMision()">¡MISIÓN CUMPLIDA!</button>
+    
+    <p style="color: #4b4b55; font-size: 0.7rem; margin-top: 20px;">LA REGLA: Tienes 5 min para terminar o pierdes la racha.</p>
+</div>
+
+<script>
+    const misiones = [
+        "Limpia tu escritorio completamente.",
+        "Haz 20 sentadillas explosivas.",
+        "Organiza tu bandeja de entrada de hoy.",
+        "Lee 5 páginas de ese libro pendiente.",
+        "Toma un vaso de agua y estira el cuello.",
+        "Escribe tu prioridad #1 para mañana.",
+        "Limpia la pantalla de tus dispositivos.",
+        "Haz 2 minutos de meditación profunda.",
+        "Bota 3 cosas que no uses de tu cuarto.",
+        "Mándale un mensaje de gratitud a alguien."
+    ];
+
+    let racha = localStorage.getItem('racha') || 0;
+    document.getElementById('racha-count').innerText = racha;
+
+    let tiempoRestante = 300; // 5 minutos
+    let interval;
+
+    function iniciarMision() {
+        // UI Changes
+        document.getElementById('click-text').style.display = 'none';
+        document.getElementById('btn-revelar').style.display = 'none';
+        document.getElementById('timer').style.display = 'block';
+        document.getElementById('btn-hecho').style.display = 'block';
+        document.getElementById('revelador').classList.remove('pulse');
+        document.getElementById('revelador').classList.add('active');
+
+        // Elegir misión
+        const randomMision = misiones[Math.floor(Math.random() * misiones.length)];
+        document.getElementById('instruccion').innerText = randomMision;
+
+        // Iniciar Cronómetro
+        iniciarTimer();
+        
+        // Vibración (solo en móviles)
+        if (navigator.vibrate) navigator.vibrate(50);
+    }
+
+    function iniciarTimer() {
+        clearInterval(interval);
+        interval = setInterval(() => {
+            let minutos = Math.floor(tiempoRestante / 60);
+            let segundos = tiempoRestante % 60;
+            document.getElementById('timer').innerText = 
+                `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+            
+            if (tiempoRestante <= 0) {
+                clearInterval(interval);
+                alert("¡Se acabó el tiempo! No rompas tu racha la próxima vez.");
+                location.reload();
+            }
+            tiempoRestante--;
+        }, 1000);
+    }
+
+    function completarMision() {
+        clearInterval(interval);
+        racha++;
+        localStorage.setItem('racha', racha);
+        document.getElementById('racha-count').innerText = racha;
+        
+        alert("¡Felicidades! Un paso más lejos de la pereza.");
+        location.reload(); // Reiniciar para la siguiente
+    }
+</script>
+
+</body>
+</html>

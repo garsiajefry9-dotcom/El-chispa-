@@ -3,24 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PREDICADOR OS | HALL OF SHAME</title>
+    <title>PREDICADOR OS | FINAL ELITE</title>
     <style>
-        :root { --main: #00ff41; --fail: #ff0000; --bg: #000; --gold: #ffd700; }
+        :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
         body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
         
-        /* Historial */
-        #history-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; padding: 20px; box-sizing: border-box; overflow-y: auto; border: 2px solid var(--main); }
-        .history-item { border-bottom: 1px solid #333; padding: 10px 0; font-size: 0.8rem; color: var(--fail); }
+        /* Panel de Historial */
+        #history-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 20px; box-sizing: border-box; overflow-y: auto; border: 2px solid var(--main); }
+        .h-item { border-bottom: 1px solid #222; padding: 10px 0; font-size: 0.7rem; color: var(--fail); text-align: left; }
 
-        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; padding: 20px; flex-direction: column; animation: pulse 0.1s infinite; }
-        @keyframes pulse { 0% { background: #f00; } 50% { background: #600; } 100% { background: #f00; } }
+        /* Pantalla de Muerte */
+        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 3000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; flex-direction: column; animation: flash 0.1s infinite; }
+        @keyframes flash { 0% { background: #f00; } 50% { background: #900; } }
+
+        .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; box-shadow: 0 0 20px var(--main); text-align: center; }
+        .boss-img { width: 100%; height: 160px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; }
+        #timer { font-size: 3rem; color: var(--fail); margin: 10px 0; font-weight: 900; visibility: hidden; }
         
-        .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; position: relative; box-shadow: 0 0 30px rgba(0,255,65,0.4); text-align: center; }
-        .boss-img { width: 100%; height: 180px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; }
-        #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 10px 0; font-weight: 900; }
-        .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn { width: 100%; padding: 15px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-p { background: var(--main); color: #000; }
         .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
         
-        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 15px; box-sizing: border-box; margin-top: 10px; text-align: center; font-size: 1.2rem; outline: none; }
-        .
+        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; text-align: center; font-size: 1rem; outline: none; }
+        .status-bar { font-size: 0.7rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--main); padding-bottom: 5px; margin-bottom: 10px; }
+        .h-btn { background: #222; color: var(--main); border: 1px solid var(--main); padding: 2px 8px; font-size: 0.6rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="history-panel">
+    <h2 style="color:var(--main)">REGISTRO DE DESHONRA</h2>
+    <div id="history-list"></div>
+    <button class="btn btn-p" onclick="closeH()" style="margin-top:20px">VOLVER</button>
+</div>
+
+<div id="death-screen">
+    <h1 id="d-title" style="font-size:3rem; margin:0">FRACASO</h1>
+    <p id="d-msg" style="font-size:1.2rem"></p>
+    <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 30px; border:3px solid #fff; margin-top:20px">REINTENTAR</button>
+</div>
+
+<div class="frame">
+    <div class="status-bar">
+        <span>RACHA: <b id="streak">0</b></span>
+        <button class="h-btn" onclick="openH()">HISTORIAL</button>
+    </div>
+    
+    <img id="main-img" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400" class="boss-img">
+
+    <select id="mode" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:8px;">
+        <option value="FISICO">ENTRENAMIENTO ESPARTANO</option>
+        <option value="SANTIDAD">SANTIDAD DE HIERRO</option>
+        <option value="MENTAL">INTERROGATORIO MENTAL</option>
+    </select>
+
+    <div id="msg" style="height: 80px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed #333; padding:5px; font-size: 0.8rem; font-weight: bold;">PREPARADO PARA EL JUICIO.</div>
+    
+    <input type="text" id="answer-input" autocomplete="off">
+    <div id="timer">00:00</div>
+    
+    <button id="start-btn" class="btn btn-p">INICIAR</button>
+    <button id="done-btn" class="btn btn-l">CUMPLIDO</button>
+</div>
+
+<script>
+    let streak = 0;
+    let startTime = 0;
+    let timerInterval;
+    let currentTask = null;
+
+    const vibra = (ms) => navigator.vibrate && navigator.vibrate(ms);
+    const hablar = (t) => {
+        const m = new SpeechSynthesisUtterance(t);
+        m.lang = 'es-ES'; m.pitch = 0.1; m.rate = 0.7;
+        window.speechSynthesis.speak(m);
+    };
+
+    const tasks = {
+        FISICO: ["50 Burpees", "100 Sentadillas", "3 Min Plancha", "60 Flexiones"],
+        SANTIDAD: ["Ducha Fría", "Sin Redes 1h", "Limpiar Habitación", "Meditar 10m"],
+        MENTAL: [{q:"7 X 8", a:"56"}, {q:"RAIZ 144", a:"12"}, {q:"SIMBOLO ORO", a:"AU"}]
+    };
+
+    function openH() { document.getElementById('history-panel').style.display = 'block'; renderH(); }
+    function closeH() { document.getElementById('history-panel').style.display = 'none'; }
+
+    function saveF(msg, time) {
+        let h = JSON.parse(localStorage.getItem('p_h') || "[]");
+        h.unshift({msg, time, d: new Date().toLocaleTimeString()});
+        localStorage.setItem('p_h', JSON.stringify(h.slice(0, 20)));
+    }
+
+    function renderH() {
+        let h = JSON.parse(localStorage.getItem('p_h') || "[]");
+        document.getElementById('history-list').innerHTML = h.map(i => 
+            `<div class="h-item">✖ ${i.time} | ${i.msg} [${i.d}]</div>`
+        ).join('');
+    }
+
+    document.getElementById('start-btn').onclick = function() {
+        startTime = Date.now();
+        const m = document.getElementById('mode').value;
+        this.style.display = 'none';
+        document.getElementById('mode').style.display = 'none';
+        document.getElementById('done-btn').style.display = 'block';
+        document.getElementById('timer').style.visibility = 'visible';
+
+        if(m === 'MENTAL') {
+            currentTask = tasks.MENTAL[Math.floor(Math.random()*tasks.MENTAL.length)];
+            document.getElementById('msg').innerText = currentTask.q;
+            document.getElementById('answer-input').style.display = 'block';
+            document.getElementById('answer-input').focus();
+        } else {
+            document.getElementById('msg').innerText = tasks[m][Math.floor(Math.random()*tasks[m].length)];
+        }
+
+        timerInterval = setInterval(() => {
+            let diff = Math.floor((Date.now() - startTime) / 1000);
+            let min = Math.floor(diff/60), sec = diff%60;
+            document.getElementById('timer').innerText = `${min<10?'0':''}${min}:${sec<10?'0':''}${sec}`;
+        }, 1000);
+    };
+
+    document.getElementById('done-btn').onclick = function() {
+        clearInterval(timerInterval);
+        const m = document.getElementById('mode').value;
+        const totalSecs = (Date.now() - startTime) / 1000;
+        const timeStr = document.getElementById('timer').innerText;
+
+        // ANTI-TRAMPA 10 SEG
+        if(m !== 'MENTAL' && totalSecs < 10) {
+            triggerDeath("MENTIROSO", "INTENTASTE ENGAÑAR AL OJO", timeStr);
+            return;
+        }
+
+        if(m === 'MENTAL') {
+            if(document.getElementById('answer-input').value.trim() !== currentTask.a) {
+                triggerDeath("ERROR MENTAL", "CEREBRO DEFECTUOSO", timeStr);
+                return;
+            }
+        }
+
+        streak++;
+        document.getElementById('streak').innerText = streak;
+        resetUI();
+    };
+
+    function triggerDeath(title, msg, time) {
+        saveF(title, time);
+        document.getElementById('d-title').innerText = title;
+        document.getElementById('d-msg').innerText = msg;
+        document.getElementById('death-screen').style.display = 'flex';
+        hablar(title + ". " + msg);
+        vibra(1000);
+    }
+
+    function resetUI() {
+        document.getElementById('start-btn').style.display = 'block';
+        document.getElementById('mode').style.display = 'block';
+        document.getElementById('done-btn').style.display = 'none';
+        document.getElementById('timer').style.visibility = 'hidden';
+        document.getElementById('answer-input').style.display = 'none';
+        document.getElementById('answer-input').value = "";
+        document.getElementById('msg').innerText = "TAREA COMPLETADA. SIGUIENTE.";
+    }
+
+    document.getElementById('answer-input').oninput = () => vibra(20);
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PREDICADOR OS | FINAL ELITE</title>
+    <style>
+        :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
+        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
+        
+        /* Panel de Historial */
+        #history-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 20px; box-sizing: border-box; overflow-y: auto; border: 2px solid var(--main); }
+        .h-item { border-bottom: 1px solid #222; padding: 10px 0; font-size: 0.7rem; color: var(--fail); text-align: left; }
+
+        /* Pantalla de Muerte */
+        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 3000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; flex-direction: column; animation: flash 0.1s infinite; }
+        @keyframes flash { 0% { background: #f00; } 50% { background: #900; } }
+
+        .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; box-shadow: 0 0 20px var(--main); text-align: center; }
+        .boss-img { width: 100%; height: 160px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; }
+        #timer { font-size: 3rem; color: var(--fail); margin: 10px 0; font-weight: 900; visibility: hidden; }
+        
+        .btn { width: 100%; padding: 15px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-p { background: var(--main); color: #000; }
+        .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
+        
+        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; text-align: center; font-size: 1rem; outline: none; }
+        .status-bar { font-size: 0.7rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--main); padding-bottom: 5px; margin-bottom: 10px; }
+        .h-btn { background: #222; color: var(--main); border: 1px solid var(--main); padding: 2px 8px; font-size: 0.6rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="history-panel">
+    <h2 style="color:var(--main)">REGISTRO DE DESHONRA</h2>
+    <div id="history-list"></div>
+    <button class="btn btn-p" onclick="closeH()" style="margin-top:20px">VOLVER</button>
+</div>
+
+<div id="death-screen">
+    <h1 id="d-title" style="font-size:3rem; margin:0">FRACASO</h1>
+    <p id="d-msg" style="font-size:1.2rem"></p>
+    <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 30px; border:3px solid #fff; margin-top:20px">REINTENTAR</button>
+</div>
+
+<div class="frame">
+    <div class="status-bar">
+        <span>RACHA: <b id="streak">0</b></span>
+        <button class="h-btn" onclick="openH()">HISTORIAL</button>
+    </div>
+    
+    <img id="main-img" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400" class="boss-img">
+
+    <select id="mode" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:8px;">
+        <option value="FISICO">ENTRENAMIENTO ESPARTANO</option>
+        <option value="SANTIDAD">SANTIDAD DE HIERRO</option>
+        <option value="MENTAL">INTERROGATORIO MENTAL</option>
+    </select>
+
+    <div id="msg" style="height: 80px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed #333; padding:5px; font-size: 0.8rem; font-weight: bold;">PREPARADO PARA EL JUICIO.</div>
+    
+    <input type="text" id="answer-input" autocomplete="off">
+    <div id="timer">00:00</div>
+    
+    <button id="start-btn" class="btn btn-p">INICIAR</button>
+    <button id="done-btn" class="btn btn-l">CUMPLIDO</button>
+</div>
+
+<script>
+    let streak = 0;
+    let startTime = 0;
+    let timerInterval;
+    let currentTask = null;
+
+    const vibra = (ms) => navigator.vibrate && navigator.vibrate(ms);
+    const hablar = (t) => {
+        const m = new SpeechSynthesisUtterance(t);
+        m.lang = 'es-ES'; m.pitch = 0.1; m.rate = 0.7;
+        window.speechSynthesis.speak(m);
+    };
+
+    const tasks = {
+        FISICO: ["50 Burpees", "100 Sentadillas", "3 Min Plancha", "60 Flexiones"],
+        SANTIDAD: ["Ducha Fría", "Sin Redes 1h", "Limpiar Habitación", "Meditar 10m"],
+        MENTAL: [{q:"7 X 8", a:"56"}, {q:"RAIZ 144", a:"12"}, {q:"SIMBOLO ORO", a:"AU"}]
+    };
+
+    function openH() { document.getElementById('history-panel').style.display = 'block'; renderH(); }
+    function closeH() { document.getElementById('history-panel').style.display = 'none'; }
+
+    function saveF(msg, time) {
+        let h = JSON.parse(localStorage.getItem('p_h') || "[]");
+        h.unshift({msg, time, d: new Date().toLocaleTimeString()});
+        localStorage.setItem('p_h', JSON.stringify(h.slice(0, 20)));
+    }
+
+    function renderH() {
+        let h = JSON.parse(localStorage.getItem('p_h') || "[]");
+        document.getElementById('history-list').innerHTML = h.map(i => 
+            `<div class="h-item">✖ ${i.time} | ${i.msg} [${i.d}]</div>`
+        ).join('');
+    }
+
+    document.getElementById('start-btn').onclick = function() {
+        startTime = Date.now();
+        const m = document.getElementById('mode').value;
+        this.style.display = 'none';
+        document.getElementById('mode').style.display = 'none';
+        document.getElementById('done-btn').style.display = 'block';
+        document.getElementById('timer').style.visibility = 'visible';
+
+        if(m === 'MENTAL') {
+            currentTask = tasks.MENTAL[Math.floor(Math.random()*tasks.MENTAL.length)];
+            document.getElementById('msg').innerText = currentTask.q;
+            document.getElementById('answer-input').style.display = 'block';
+            document.getElementById('answer-input').focus();
+        } else {
+            document.getElementById('msg').innerText = tasks[m][Math.floor(Math.random()*tasks[m].length)];
+        }
+
+        timerInterval = setInterval(() => {
+            let diff = Math.floor((Date.now() - startTime) / 1000);
+            let min = Math.floor(diff/60), sec = diff%60;
+            document.getElementById('timer').innerText = `${min<10?'0':''}${min}:${sec<10?'0':''}${sec}`;
+        }, 1000);
+    };
+
+    document.getElementById('done-btn').onclick = function() {
+        clearInterval(timerInterval);
+        const m = document.getElementById('mode').value;
+        const totalSecs = (Date.now() - startTime) / 1000;
+        const timeStr = document.getElementById('timer').innerText;
+
+        // ANTI-TRAMPA 10 SEG
+        if(m !== 'MENTAL' && totalSecs < 10) {
+            triggerDeath("MENTIROSO", "INTENTASTE ENGAÑAR AL OJO", timeStr);
+            return;
+        }
+
+        if(m === 'MENTAL') {
+            if(document.getElementById('answer-input').value.trim() !== currentTask.a) {
+                triggerDeath("ERROR MENTAL", "CEREBRO DEFECTUOSO", timeStr);
+                return;
+            }
+        }
+
+        streak++;
+        document.getElementById('streak').innerText = streak;
+        resetUI();
+    };
+
+    function triggerDeath(title, msg, time) {
+        saveF(title, time);
+        document.getElementById('d-title').innerText = title;
+        document.getElementById('d-msg').innerText = msg;
+        document.getElementById('death-screen').style.display = 'flex';
+        hablar(title + ". " + msg);
+        vibra(1000);
+    }
+
+    function resetUI() {
+        document.getElementById('start-btn').style.display = 'block';
+        document.getElementById('mode').style.display = 'block';
+        document.getElementById('done-btn').style.display = 'none';
+        document.getElementById('timer').style.visibility = 'hidden';
+        document.getElementById('answer-input').style.display = 'none';
+        document.getElementById('answer-input').value = "";
+        document.getElementById('msg').innerText = "TAREA COMPLETADA. SIGUIENTE.";
+    }
+
+    document.getElementById('answer-input').oninput = () => vibra(20);
+</script>
+</body>
+</html>

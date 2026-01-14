@@ -3,61 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EL PREDICADOR | SISTEMA ÉLITE</title>
+    <title>EL PREDICADOR | V.09 MODO DIOS</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
-        body { 
-            background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; 
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
-            margin: 0; text-transform: uppercase; overflow: hidden;
-        }
-        /* Pantalla de Muerte Roja Parpadeante */
-        #death-screen { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--fail); z-index: 1000; justify-content: center; align-items: center; 
-            color: #000; font-weight: 900; text-align: center; padding: 20px; flex-direction: column; 
-            animation: pulse 0.2s infinite; 
-        }
-        @keyframes pulse { 0% { background: #f00; } 50% { background: #b00; } 100% { background: #f00; } }
-        
-        .frame { 
-            width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; 
-            background: #050505; position: relative; box-shadow: 0 0 20px rgba(0,255,65,0.2); 
-        }
-        #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 15px 0; font-weight: 900; text-shadow: 0 0 10px var(--fail); }
+        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
+        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; padding: 20px; flex-direction: column; animation: pulse 0.1s infinite; }
+        @keyframes pulse { 0% { background: #f00; } 50% { background: #600; } 100% { background: #f00; } }
+        .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; position: relative; box-shadow: 0 0 30px rgba(0,255,65,0.2); }
+        #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 15px 0; font-weight: 900; }
         .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-p { background: var(--main); color: #000; }
         .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
         #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 15px; box-sizing: border-box; margin-top: 10px; text-align: center; font-size: 1.2rem; }
-        select { width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; font-family: inherit; font-weight: bold; font-size: 1rem; }
-        #status { font-weight: 900; border-bottom: 1px solid var(--main); padding-bottom: 5px; display: flex; justify-content: space-between; margin-bottom: 10px; }
+        select { width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; font-family: inherit; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="death-screen">
-    <h1 style="font-size: 2.5rem; margin: 0;">VOLVISTE A FRACASAR</h1>
-    <p id="death-msg" style="font-size: 1.4rem;">(RACHA ELIMINADA, PERDEDOR)</p>
-    <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:10px 40px; border:3px solid #fff;">REINTENTAR DESDE CERO</button>
+    <h1 style="font-size: 2rem;">VOLVISTE A FRACASAR</h1>
+    <p id="death-msg">(RACHA ELIMINADA, ESCORIA)</p>
+    <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:10px 30px; border:2px solid #fff;">REINTENTAR DESDE LA NADA</button>
 </div>
 
 <div class="frame">
-    <div id="status"><span>PREDICADOR V.08</span> <span style="color:var(--main)">VIGILANDO</span></div>
+    <div style="font-weight: 900; border-bottom: 1px solid var(--main); padding-bottom: 5px; display: flex; justify-content: space-between;">
+        <span>PREDICADOR V.09</span> <span>SISTEMA ACTIVO</span>
+    </div>
     
     <select id="mode-select">
-        <option value="TAREA DOMÉSTICA">TAREA DOMÉSTICA</option>
-        <option value="EJERCICIO FÍSICO">EJERCICIO FÍSICO</option>
-        <option value="PEREZA CRÓNICA">PEREZA CRÓNICA</option>
-        <option value="RETO MENTAL">INTERROGATORIO MENTAL</option>
+        <option value="FISICO">EJERCICIO FÍSICO</option>
+        <option value="DOMESTICO">TAREA DOMÉSTICA</option>
+        <option value="MENTAL">INTERROGATORIO EXTREMO</option>
     </select>
 
-    <div id="msg" style="height: 120px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 15px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold;">ELIGE TU DESTINO...</div>
+    <div id="msg" style="height: 130px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 15px 0; border: 1px dashed var(--main); padding:10px; font-size: 1.1rem;">SELECCIONA TU TORTURA...</div>
     
-    <input type="text" id="answer-input" placeholder="ESCRIBE LA RESPUESTA AQUÍ">
-    
+    <input type="text" id="answer-input" placeholder="RESPUESTA AQUÍ">
     <center><div id="timer">00:00</div></center>
     
-    <button id="b1" class="btn btn-p">ASUMIR PENITENCIA</button>
+    <button id="b1" class="btn btn-p">ASUMIR JUICIO</button>
     <button id="b2" class="btn btn-l">ENVIAR PRUEBA</button>
 </div>
 
@@ -72,26 +57,31 @@
         o.start(); o.stop(audioCtx.currentTime + d);
     }
 
-    const preguntas = [
-        { q: "¿CUÁNTO ES 12 X 12?", a: "144" },
-        { q: "¿QUÉ TIENE LLAVES PERO NO ABRE NADA?", a: "PIANO" },
-        { q: "¿CUÁNTOS MESES TIENEN 28 DÍAS?", a: "12" },
-        { q: "SI UN TREN ELÉCTRICO VA AL NORTE, ¿HACIA DÓNDE VA EL HUMO?", a: "NINGUN LADO" }
-    ];
+    const misiones = {
+        FISICO: ["HAZ 40 FLEXIONES", "HAZ 50 SENTADILLAS", "MANTÉN PLANCHA 1 MINUTO", "30 BURPEES AHORA"],
+        DOMESTICO: ["LAVA LOS PLATOS", "ORDENA TU ESCRITORIO", "SACA LA BASURA", "TIENDE TU CAMA"],
+        MENTAL: [
+            { q: "¿RAÍZ CUADRADA DE 169?", a: "13" },
+            { q: "¿CUAL ES EL QUINTO PLANETA?", a: "JUPITER" },
+            { q: "SI 5=25, 4=16, 3=9, ¿2=?", a: "4" },
+            { q: "TIENES 10 SEG. ¿CUANTO ES 15 X 4 - 12?", a: "48" }
+        ]
+    };
+
+    const insultos = ["CEREBRO DE MOSQUITO", "VERGÜENZA PARA TU LINDAJE", "INÚTIL DETECTADO", "BASURA HUMANA"];
 
     let pActual = null; let st, iv;
 
     document.getElementById('b1').onclick = function() {
-        // Bloqueo Nocturno (11 PM - 5 AM)
         const h = new Date().getHours();
         if (h >= 23 || h < 5) {
-            vibra([500, 200, 500]); sound(60, 'sawtooth', 2, 0.4);
-            document.getElementById('death-msg').innerText = "NO SABES NI CUANDO DORMIR. DUERME O HABRÁ CONSECUENCIAS.";
+            vibra([500, 200, 500]); sound(50, 'square', 2, 0.4);
+            document.getElementById('death-msg').innerText = "NO SABES NI CUANDO DORMIR. DUERME, PEDAZO DE ANIMAL.";
             document.getElementById('death-screen').style.display = 'flex';
             localStorage.clear(); return;
         }
 
-        const m = document.getElementById('mode-select').value;
+        const mode = document.getElementById('mode-select').value;
         vibra(100); sound(440, 'square', 0.1);
         
         this.style.display = 'none';
@@ -99,13 +89,14 @@
         document.getElementById('b2').style.display = 'block';
         document.getElementById('timer').style.display = 'block';
 
-        if(m === 'RETO MENTAL') {
-            pActual = preguntas[Math.floor(Math.random()*preguntas.length)];
+        if(mode === 'MENTAL') {
+            pActual = misiones.MENTAL[Math.floor(Math.random()*misiones.MENTAL.length)];
             document.getElementById('msg').innerText = pActual.q;
             document.getElementById('answer-input').style.display = 'block';
             document.getElementById('answer-input').focus();
         } else {
-            document.getElementById('msg').innerText = "PENITENCIA EN CURSO. NO FALLES.";
+            const lista = misiones[mode];
+            document.getElementById('msg').innerText = lista[Math.floor(Math.random()*lista.length)];
         }
 
         let s = 0; st = Date.now();
@@ -113,30 +104,29 @@
             s++;
             let min = Math.floor(s/60), seg = s%60;
             document.getElementById('timer').innerText = (min<10?'0':'')+min+":"+(seg<10?'0':'')+seg;
-            // Vibración y sonido de presión si tarda más de 60s
             if(s > 60) { sound(100, 'sawtooth', 0.1, 0.2); vibra(50); }
         }, 1000);
     };
 
     document.getElementById('b2').onclick = function() {
         clearInterval(iv);
-        const m = document.getElementById('mode-select').value;
+        const mode = document.getElementById('mode-select').value;
         const t = Math.floor((Date.now() - st) / 1000);
+        const ins = insultos[Math.floor(Math.random()*insultos.length)];
 
-        if(m === 'RETO MENTAL') {
+        if(mode === 'MENTAL') {
             const r = document.getElementById('answer-input').value.toUpperCase().trim();
             if(r === pActual.a) {
-                sound(1000, 'sine', 0.3); alert("LOGRADO EN " + t + "s. SIGUES CON VIDA."); location.reload();
+                alert("SUERTE. SIGUES SIENDO ÚTIL POR AHORA."); location.reload();
             } else {
-                vibra(1000); sound(50, 'sawtooth', 1.5, 0.5);
-                document.getElementById('death-msg').innerText = "RESPUESTA INCORRECTA. CEREBRO DEFECTUOSO.";
+                vibra(1000); sound(60, 'sawtooth', 1.5, 0.5);
+                document.getElementById('death-msg').innerText = `ERROR. ${ins}. RACHA ELIMINADA.`;
                 document.getElementById('death-screen').style.display = 'flex';
                 localStorage.clear();
             }
         } else {
             if(t > 60) {
-                vibra(500); sound(100, 'square', 0.5);
-                alert("TARDARTE " + t + "s ES UNA VERGÜENZA. ERES LENTO.");
+                vibra(500); alert(`${t} SEGUNDOS? ERES UNA DECEPCIÓN. ${ins}.`);
                 location.reload();
             } else {
                 location.reload();

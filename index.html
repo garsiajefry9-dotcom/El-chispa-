@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PREDICADOR OS | V.19 GOLDEN</title>
+    <title>PREDICADOR OS | ANTI-CHEAT</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; --gold: #ffd700; }
         body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
@@ -23,13 +23,13 @@
 <body>
 
 <div id="death-screen">
-    <h1 style="font-size: 2.2rem;">FRACASO HUMANO</h1>
+    <h1 id="death-title">FRACASO HUMANO</h1>
     <p id="death-msg"></p>
     <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 40px; border:3px solid #fff; margin-top: 20px;">REINTENTAR</button>
 </div>
 
 <div class="frame" id="main-frame">
-    <div class="status-bar"><span>RACHA: <b id="streak-val">0</b></span><span>V.19 GOLDEN</span></div>
+    <div class="status-bar"><span>RACHA: <b id="streak-val">0</b></span><span>V.20 ANTI-TRAMPA</span></div>
     <img id="main-img" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400&q=80" class="boss-img">
 
     <select id="mode-select" onchange="actualizarModo()" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:10px;">
@@ -38,7 +38,7 @@
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
 
-    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold; text-align: center; font-size: 0.9rem;">ESPERANDO ÓRDENES...</div>
+    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold; text-align: center; font-size: 0.9rem;">EL OJO DETECTA MENTIRAS.</div>
     
     <input type="text" id="answer-input" placeholder="RESPUESTA">
     <div id="timer">00:00</div>
@@ -70,29 +70,59 @@
     };
 
     let rachaSesion = 0;
+    let tiempoInicioTask = 0;
+    let qActiva = null;
     
     window.onload = () => {
         const guardado = localStorage.getItem('modo_predicador');
         if(guardado) document.getElementById('mode-select').value = guardado;
     };
 
+    const actualizarModo = () => {
+        const m = document.getElementById('mode-select').value;
+        localStorage.setItem('modo_predicador', m);
+        playSound(800, 'sine', 0.1);
+    };
+
     document.getElementById('b1').onclick = function() {
+        tiempoInicioTask = Date.now();
         playSound(440, 'square', 0.2);
         const m = document.getElementById('mode-select').value;
-        this.style.display = 'none'; document.getElementById('mode-select').style.display = 'none';
-        document.getElementById('b2').style.display = 'block'; document.getElementById('timer').style.display = 'block';
+        this.style.display = 'none'; 
+        document.getElementById('mode-select').style.display = 'none';
+        document.getElementById('b2').style.display = 'block'; 
+        document.getElementById('timer').style.display = 'block';
 
         if(m === 'MENTAL') {
             qActiva = misiones.MENTAL[Math.floor(Math.random()*misiones.MENTAL.length)];
             document.getElementById('msg').innerText = qActiva.q;
-            document.getElementById('answer-input').style.display = 'block'; document.getElementById('answer-input').focus();
-        } else { document.getElementById('msg').innerText = misiones[m][Math.floor(Math.random()*misiones[m].length)]; }
+            document.getElementById('answer-input').style.display = 'block'; 
+            document.getElementById('answer-input').focus();
+        } else { 
+            document.getElementById('msg').innerText = misiones[m][Math.floor(Math.random()*misiones[m].length)]; 
+        }
     };
 
     document.getElementById('b2').onclick = function() {
         const m = document.getElementById('mode-select').value;
+        const segundosTranscurridos = (Date.now() - tiempoInicioTask) / 1000;
+
+        // LÓGICA ANTI-TRAMPA (Mínimo 10 segundos para tareas físicas/santidad)
+        if (m !== 'MENTAL' && segundosTranscurridos < 10) {
+            rachaSesion = 0;
+            document.getElementById('streak-val').innerText = "0";
+            playSound(30, 'sawtooth', 2, 1);
+            hablar("MENTIROSO. LA TRAMPA ES DEBILIDAD.");
+            document.getElementById('death-title').innerText = "MENTIROSO DETECTADO";
+            document.getElementById('death-msg').innerText = "RACHA RESETEADA POR INTENTAR ENGAÑAR AL OJO.";
+            document.getElementById('death-screen').style.display = 'flex';
+            return;
+        }
+
+        // Validación mental normal
         if(m === 'MENTAL' && document.getElementById('answer-input').value.toUpperCase().trim() !== qActiva.a) {
-            playSound(40, 'sawtooth', 2, 0.8); hablar("ERES DEBIL");
+            rachaSesion = 0;
+            playSound(40, 'sawtooth', 2, 0.8); hablar("ERROR");
             document.getElementById('death-screen').style.display = 'flex';
             return;
         }
@@ -102,20 +132,21 @@
         
         if(rachaSesion === 5) {
             document.getElementById('main-frame').classList.add('gold');
-            hablar("HAS SIDO RECONOCIDO POR EL OJO", 0.8);
-            alert("MODO DORADO ACTIVADO: ERES UN ELEGIDO.");
+            hablar("HAS SIDO RECONOCIDO", 0.8);
         }
         
-        // Reset para siguiente tarea sin recargar
+        // Reset interfaz
         document.getElementById('b1').style.display = 'block';
         document.getElementById('mode-select').style.display = 'block';
         document.getElementById('b2').style.display = 'none';
         document.getElementById('timer').style.display = 'none';
         document.getElementById('answer-input').style.display = 'none';
         document.getElementById('answer-input').value = "";
-        document.getElementById('msg').innerText = "SIGUIENTE NIVEL DISPONIBLE.";
+        document.getElementById('msg').innerText = "TAREA REGISTRADA. CONTINÚA.";
         playSound(880, 'sine', 0.2);
     };
+
+    document.getElementById('answer-input').oninput = () => { playSound(600, 'sine', 0.05, 0.05); vibra(20); };
 </script>
 </body>
 </html>

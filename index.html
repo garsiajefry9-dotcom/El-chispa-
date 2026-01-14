@@ -7,136 +7,25 @@
     <style>
         :root { --bg: #0a0a0c; --card: #16161a; --accent: #00f2ff; --secondary: #ff007a; --text: #ffffff; }
         body { font-family: sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .app-container { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 40px; text-align: center; border: 1px solid #2d2d35; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .app-container { width: 90%; max-width: 400px; background: var(--card); padding: 25px; border-radius: 40px; text-align: center; border: 1px solid #2d2d35; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .racha-badge { background: rgba(255, 0, 122, 0.1); color: var(--secondary); padding: 5px 15px; border-radius: 20px; font-weight: bold; border: 1px solid var(--secondary); }
+        h1 { font-size: 1.8rem; font-weight: 900; background: linear-gradient(to right, #00f2ff, #ff007a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.4)); margin: 0; }
         
-        h1 { 
-            font-size: 2.2rem; font-weight: 900; text-transform: uppercase;
-            background: linear-gradient(to right, #00f2ff, #ff007a);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.4)); margin: 0;
-        }
+        .selector-box { margin-bottom: 20px; }
+        select { background: #1c1c22; color: white; border: 1px solid var(--accent); padding: 8px; border-radius: 10px; width: 100%; cursor: pointer; }
 
-        .reveal-circle { 
-            width: 200px; height: 200px; border-radius: 50%; margin: 30px auto; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            cursor: pointer; border: 4px dashed #2d2d35; transition: 0.4s; position: relative;
-        }
+        .reveal-circle { width: 160px; height: 160px; border-radius: 50%; margin: 15px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px dashed #2d2d35; transition: 0.4s; position: relative; overflow: hidden; }
+        .reveal-circle img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; opacity: 0.6; }
+        .reveal-circle.active { border-style: solid !important; border-color: var(--accent) !important; box-shadow: 0 0 20px var(--accent); animation: lightning 1.5s infinite alternate; }
+        
+        @keyframes lightning { from { transform: scale(1.02); } to { transform: scale(1.08); } }
+        #timer { font-size: 2rem; font-weight: 800; color: var(--accent); display: none; z-index: 2; text-shadow: 2px 2px 10px black; }
+        #click-text { z-index: 2; font-weight: bold; }
 
-        .reveal-circle.active { 
-            border-style: solid !important; border-color: var(--accent) !important;
-            box-shadow: 0 0 20px var(--accent), inset 0 0 20px var(--accent);
-            animation: lightning 1.5s infinite alternate; 
-        }
-
-        @keyframes lightning { from { opacity: 1; transform: scale(1.05); } to { opacity: 0.8; transform: scale(1.02); } }
-        #timer { font-size: 2.5rem; font-weight: 800; color: var(--accent); display: none; }
-        .btn-main { background: linear-gradient(135deg, var(--accent), #0072ff); color: black; border: none; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
-        .btn-done { background: var(--secondary); color: white; margin-top: 15px; display: none; }
-        /* Menú de navegación inferior */
-.navbar {
-    display: flex;
-    justify-content: space-around;
-    background: #1c1c22;
-    padding: 15px;
-    border-radius: 25px;
-    margin-top: 25px;
-    border: 1px solid #2d2d35;
-}
-
-.nav-item {
-    color: #4b4b55;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.nav-item.active {
-    color: var(--accent);
-    filter: drop-shadow(0 0 5px var(--accent));
-}
-    </style>
-</head>
-<body>
-    <div class="app-container">
-        <div class="header">
-            <h1>El Chispa</h1>
-            <div class="racha-badge">🔥 <span id="racha-count">7</span> DÍAS</div>
-        </div>
-        <div id="revelador" class="reveal-circle">
-            <span id="click-text">TOCA PARA<br>REVELAR</span>
-            <div id="timer">05:00</div>
-        </div>
-        <div id="instruccion" style="margin-bottom:20px;">¿Listo para dejar de procrastinar?</div>
-        <button id="btn-revelar" class="btn-main">¡DAME UNA CHISPA!</button>
-        <button id="btn-hecho" class="btn-main btn-done">¡MISIÓN CUMPLIDA!</button>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-        // 1. Guardar y Cargar Racha Automáticamente
-let rachaGuardada = localStorage.getItem('chispa_racha') || 0;
-document.getElementById('racha-count').innerText = rachaGuardada;
-
-// Actualizar racha al ganar
-btnHecho.addEventListener('click', () => {
-    rachaGuardada = parseInt(rachaGuardada) + 1;
-    localStorage.setItem('chispa_racha', rachaGuardada);
-    document.getElementById('racha-count').innerText = rachaGuardada;
-    
-    // El confeti y sonido que ya tienes...
-});
-
-// 2. Lógica del Menú
-const navItems = document.querySelectorAll('.nav-item');
-navItems.forEach((item, index) => {
-    item.addEventListener('click', () => {
-        // Quitar activo de todos y ponerlo al que tocamos
-        navItems.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-
-        // Acciones del menú
-        if(index === 1) { // Icono de Estadísticas 📊
-            alert("Llevas " + rachaGuardada + " misiones completadas con éxito. ¡No te detengas!");
-        }
-        if(index === 2) { // Icono de Ajustes ⚙️
-            let nombre = prompt("¿Cómo quieres que te llame El Chispa?");
-            if(nombre) alert("¡Entendido, " + nombre + "!");
-        }
-    });
-});
-
-        const misiones = ["⚡ Limpia tu escritorio", "⚡ Haz 10 flexiones", "⚡ Bebe agua", "⚡ Ordena 5 archivos", "⚡ Escribe tus metas"];
-        const btnRevelar = document.getElementById('btn-revelar');
-        const btnHecho = document.getElementById('btn-hecho');
-        const revelador = document.getElementById('revelador');
-        const timerDisplay = document.getElementById('timer');
-
-        btnRevelar.addEventListener('click', () => {
-            const mision = misiones[Math.floor(Math.random() * misiones.length)];
-            document.getElementById('click-text').style.display = 'none';
-            timerDisplay.style.display = 'block';
-            revelador.classList.add('active');
-            document.getElementById('instruccion').innerText = mision;
-            btnRevelar.style.display = 'none';
-            btnHecho.style.display = 'block';
-            iniciarCronometro(300);
-        });
-
-        btnHecho.addEventListener('click', () => {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00f2ff', '#ff007a'] });
-            new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3').play();
-            setTimeout(() => { alert("¡Misión cumplida!"); location.reload(); }, 1500);
-        });
-
-        function iniciarCronometro(t) {
-            const int = setInterval(() => {
-                let m = Math.floor(t / 60), s = t % 60;
-                timerDisplay.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                if (--t < 0) { clearInterval(int); location.reload(); }
-            }, 1000);
-        }
-    </script>
-</body>
-</html>
+        .btn-main { background: linear-gradient(135deg, var(--accent), #0072ff); color: black; border: none; padding: 15px; border-radius: 20px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; margin-bottom: 10px; }
+        .btn-done { background: var(--secondary); color: white; display: none; }
+        
+        .navbar { display: flex; justify-content: space-around; background: #1c1c22; padding: 12px; border-radius: 25px; margin-top: 15px; border: 1px solid #2d2d35; }
+        .nav-
+        

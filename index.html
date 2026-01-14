@@ -3,83 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EL SARGENGO - Disciplina o Nada</title>
+    <title>EL SARGENGO</title>
     <style>
         :root { --bg: #0d0d0d; --military: #ff9800; --danger: #ff0000; --text: #e0e0e0; }
-        body { font-family: 'Courier New', Courier, monospace; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.1s; }
-        .app-container { width: 90%; max-width: 400px; background: #1a1a1a; padding: 25px; border: 3px solid var(--military); border-radius: 0px; text-align: center; position: relative; z-index: 5; }
-        h1 { font-size: 2rem; color: var(--military); text-transform: uppercase; letter-spacing: 3px; margin: 0; border-bottom: 2px solid var(--military); padding-bottom: 10px; }
-        .racha-badge { color: var(--military); font-weight: bold; margin-top: 15px; display: block; font-size: 1.2rem; }
+        body { font-family: 'Courier New', monospace; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .app-container { width: 90%; max-width: 400px; background: #1a1a1a; padding: 25px; border: 3px solid var(--military); text-align: center; }
+        h1 { font-size: 1.8rem; color: var(--military); text-transform: uppercase; margin: 0; border-bottom: 2px solid var(--military); padding-bottom: 10px; }
+        .racha-badge { color: var(--military); font-weight: bold; margin-top: 15px; display: block; }
         .selector-box { margin: 20px 0; }
-        select { width: 100%; background: #000; color: var(--military); border: 1px solid var(--military); padding: 10px; font-weight: bold; text-transform: uppercase; }
-        .reveal-circle { width: 180px; height: 180px; border: 5px double var(--military); margin: 20px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; transition: 0.3s; background: #000; }
-        #timer { font-size: 3rem; font-weight: bold; color: var(--military); display: none; }
-        .btn-main { background: var(--military); color: black; border: none; padding: 20px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; }
-        .btn-done { background: #2e7d32; color: white; display: none; }
-        .navbar { display: flex; justify-content: space-around; background: #111; padding: 10px; margin-top: 20px; border-top: 1px solid var(--military); }
-        .nav-item { color: var(--military); font-size: 1.5rem; cursor: pointer; opacity: 0.6; }
-        /* Efecto de Susto */
-        .susto-flash { background-color: var(--danger) !important; }
-        .shake { animation: shake 0.2s infinite; }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-2px, -1px); } 100% { transform: translate(1px, -1px); } }
+        select { width: 100%; background: #000; color: var(--military); border: 1px solid var(--military); padding: 10px; font-weight: bold; }
+        .reveal-circle { width: 160px; height: 160px; border: 5px double var(--military); margin: 15px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; transition: 0.2s; }
+        #timer { font-size: 2.5rem; font-weight: bold; color: var(--military); display: none; }
+        .btn-main { background: var(--military); color: black; border: none; padding: 18px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; }
+        .btn-done { background: #2e7d32; color: white; display: none; margin-top: 10px; }
+        .susto-flash { background-color: var(--danger) !important; animation: shake 0.1s infinite; }
+        @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
     </style>
 </head>
 <body>
 
 <div class="app-container" id="main-ui">
     <h1>EL SARGENGO</h1>
-    <span class="racha-badge">CHISPAS LOGRADAS: <span id="racha-count">0</span></span>
-    <div class="selector-box"><select id="categoria-selector"><option value="domesticas">CASA (ORDEN O CAOS)</option><option value="ejercicio">CUERPO (SUDOR O DEBILIDAD)</option><option value="trabajo">MENTE (ENFOQUE O FRACASO)</option></select></div>
-    <div id="revelador" class="reveal-circle"><div id="timer">05:00</div><span id="click-text">ESPERANDO ÓRDENES</span></div>
-    <div id="instruccion" style="margin-bottom:20px; height: 40px; font-size: 0.9rem;">¿VAS A MOVERTE O TE QUEDARÁS AHÍ?</div>
+    <span class="racha-badge">CHISPAS: <span id="racha-count">0</span></span>
+    
+    <div class="selector-box">
+        <select id="categoria-selector">
+            <option value="domesticas">CASA (ORDEN)</option>
+            <option value="ejercicio">CUERPO (SUDOR)</option>
+            <option value="trabajo">MENTE (ENFOQUE)</option>
+        </select>
+    </div>
+
+    <div id="revelador" class="reveal-circle">
+        <div id="timer">05:00</div>
+        <span id="click-text">ESPERANDO</span>
+    </div>
+
+    <div id="instruccion" style="margin-bottom:20px; font-size: 0.9rem; font-weight: bold;">¿VAS A MOVERTE?</div>
+
     <button id="btn-revelar" class="btn-main">¡RECIBIR ORDEN!</button>
     <button id="btn-hecho" class="btn-main btn-done">¡ORDEN CUMPLIDA!</button>
-    <div class="navbar"><div class="nav-item" onclick="location.reload()">⚡</div><div class="nav-item" onclick="verStats()">📊</div><div class="nav-item" onclick="configurarNombre()">⚙️</div></div>
 </div>
 
 <script>
+    const misionesDB = {
+        domesticas: ["Tira 5 cosas viejas", "Limpia tu escritorio", "Haz tu cama"],
+        ejercicio: ["20 Flexiones ahora", "1 min de plancha", "30 Sentadillas"],
+        trabajo: ["Lee 5 páginas", "Planifica tu día", "Estudia 10 min"]
+    };
+
     let racha = localStorage.getItem('sargento_racha') || 0;
     document.getElementById('racha-count').innerText = racha;
     let intentosNocturnos = 0;
 
     const btnRev = document.getElementById('btn-revelar');
-    const circulo = document.getElementById('revelador');
+    const btnDone = document.getElementById('btn-hecho');
+    const timerText = document.getElementById('timer');
+    const instr = document.getElementById('instruccion');
 
-    btnRev.addEventListener('click', () => {
-        const ahora = new Date();
-        const hora = ahora.getHours();
-
-        // 11 PM (23) a 5 AM
+    btnRev.onclick = () => {
+        const hora = new Date().getHours();
+        
+        // Lógica de Susto Nocturno (23:00 a 05:00)
         if (hora >= 23 || hora < 5) {
             intentosNocturnos++;
             if (intentosNocturnos === 1) {
-                alert("¿QUÉ HACES DESPIERTO, RECLUTA? UN SOLDADO NECESITA DORMIR. ÚLTIMA ADVERTENCIA.");
-                // Dejamos que haga la misión esta vez
+                alert("¿QUÉ HACES DESPIERTO? VE A DORMIR. ÚLTIMO AVISO.");
             } else {
-                ejecutarSusto();
+                document.body.classList.add('susto-flash');
+                document.getElementById('main-ui').style.display = 'none';
+                setTimeout(() => {
+                    alert("¡TE DIJE QUE DORMIRAS! RACHA BORRADA.");
+                    localStorage.setItem('sargento_racha', 0);
+                    location.reload();
+                }, 400);
                 return;
             }
         }
 
         const cat = document.getElementById('categoria-selector').value;
-        const misiones = {
-            domesticas: ["Tira 5 cosas que no sirven YA", "Limpia tu zona de combate", "Haz tu cama como un soldado"],
-            ejercicio: ["30 Flexiones ahora mismo", "Plancha de 1 minuto", "50 Sentadillas"],
-            trabajo: ["Cierra TikTok y lee 5 páginas", "Escribe tus 3 metas", "Estudia 10 min"]
-        };
+        const lista = misionesDB[cat];
+        instr.innerText = lista[Math.floor(Math.random() * lista.length)].toUpperCase();
         
-        document.getElementById('instruccion').innerText = misiones[cat][Math.floor(Math.random()*misiones[cat].length)].toUpperCase();
         btnRev.style.display = 'none';
-        document.getElementById('btn-hecho').style.display = 'block';
-        document.getElementById('timer').style.display = 'block';
+        btnDone.style.display = 'block';
+        timerText.style.display = 'block';
         document.getElementById('click-text').style.display = 'none';
-        iniciarCronometro(300);
-    });
-
-    function ejecutarSusto() {
-        document.body.classList.add('susto-flash', 'shake');
-        document.getElementById('main-ui').style.opacity = "0";
-        new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3').play(); // Sonido alerta
         
-        setTimeout(() => {
-            alert("¡TE DIJE QUE TE FUERAS A DORMIR! TU DEBILIDAD NO TIENE LÍMITES.
+        let t = 300;
+        const x = setInterval(() => {
+            let m = Math.floor(t/60), s = t%60;
+            timerText.innerText = `${m}:${s<10?'0':''}${s}`;
+            if (--t < 0) {
+                clearInterval(x);
+                alert("¡FRACASASTE! RACHA A CERO.");
+                localStorage.setItem('sargento_racha', 0);
+                location.reload();
+            }
+        }, 1000);
+    };
+
+    btnDone.onclick = () => {
+        racha = parseInt(racha) + 1;
+        localStorage.setItem('sargento_racha', racha);
+        alert("BIEN. SIGUE ASÍ.");
+        location.reload();
+    };
+</script>
+</body>
+</html>

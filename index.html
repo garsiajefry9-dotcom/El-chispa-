@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EL PREDICADOR | INFINITUM</title>
+    <title>EL PREDICADOR | PERSISTENCE</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
         body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
         #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; padding: 20px; flex-direction: column; animation: pulse 0.1s infinite; }
         @keyframes pulse { 0% { background: #f00; } 50% { background: #600; } 100% { background: #f00; } }
         .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; position: relative; box-shadow: 0 0 30px rgba(0,255,65,0.4); text-align: center; }
-        .boss-img { width: 100%; height: 180px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; box-shadow: 0 0 15px var(--main); }
+        .boss-img { width: 100%; height: 180px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; box-shadow: 0 0 15px var(--main); background: #111; }
         #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 10px 0; font-weight: 900; }
         .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-p { background: var(--main); color: #000; }
@@ -22,33 +22,34 @@
 <body>
 
 <div id="death-screen">
-    <h1 style="font-size: 2.2rem;">FRACASO TOTAL</h1>
+    <h1 style="font-size: 2.2rem;">JUICIO FINAL</h1>
     <p id="death-msg"></p>
-    <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 40px; border:3px solid #fff; margin-top: 20px;">REINTENTAR</button>
+    <button onclick="reiniciar()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 40px; border:3px solid #fff; margin-top: 20px;">VOLVER AL JUICIO</button>
 </div>
 
 <div class="frame">
-    <div class="status-bar"><span>PREDICADOR OS</span><span>V.16 INFINITUM</span></div>
-    <img id="main-img" src="https://files.oaiusercontent.com/file-78U7vXm9z3V5C2fD6T1K4L?se=2024-05-23T15%3A20%3A22Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3Dpredicador_ojo.webp" class="boss-img">
+    <div class="status-bar"><span>PREDICADOR OS</span><span>V.17 STABLE</span></div>
+    <img id="main-img" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400&q=80" class="boss-img">
 
-    <select id="mode-select" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:10px;">
+    <select id="mode-select" onchange="actualizarModo()" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:10px;">
         <option value="FISICO">ENTRENAMIENTO ESPARTANO</option>
         <option value="SANTIDAD">SANTIDAD DE HIERRO</option>
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
 
-    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold; text-align: center;">VIGILANCIA PERPETUA.</div>
+    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold; text-align: center;">VIGILANCIA ETERNA</div>
     
     <input type="text" id="answer-input" placeholder="ESCRIBE AQUÍ">
     <div id="timer">00:00</div>
     
-    <button id="b1" class="btn btn-p">INICIAR JUICIO</button>
-    <button id="b2" class="btn btn-l">MARCAR CUMPLIMIENTO</button>
+    <button id="b1" class="btn btn-p">INICIAR PENITENCIA</button>
+    <button id="b2" class="btn btn-l">CUMPLIDO</button>
 </div>
 
 <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const vibra = (ms) => { if(navigator.vibrate) navigator.vibrate(ms); }
+    
     const playSound = (f, t, d, v = 0.1) => {
         const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
         o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
@@ -56,39 +57,65 @@
         o.connect(g); g.connect(audioCtx.destination);
         o.start(); o.stop(audioCtx.currentTime + d);
     };
+
     const hablar = (t) => {
         const m = new SpeechSynthesisUtterance(t);
         m.lang = 'es-ES'; m.pitch = 0.1; m.rate = 0.6;
         window.speechSynthesis.speak(m);
     };
 
-    document.getElementById('answer-input').oninput = () => { playSound(600, 'sine', 0.05, 0.05); vibra(20); };
-
-    const misiones = {
-        FISICO: [
-            "50 Burpees", "100 Sentadillas", "3 Min Plancha", "60 Flexiones", "80 Mountain Climbers", "2 Min Sentadilla Pared", "50 Flexiones Diamante", "100 Jumping Jacks", "40 Lunges por pierna", "10 Burpees con Salto", "5 Min de Sombra (Boxeo)", "70 Abdominales", "50 Fondos de Tríceps", "3 Min Salto de Cuerda imaginaria", "Plancha Lateral 90 seg/lado", "40 Elevaciones de Piernas", "60 Superman (Lumbar)", "100 Golpes de aire rápidos", "30 Burpees sin manos", "Sprint estático 1 Min", "50 Puente de Glúteo", "40 Flexiones Arqueras", "Plancha comando 2 Min", "100 Toques de hombro en plancha", "50 Sentadillas con salto", "30 Caminata de oso", "1 Min de Escaladores lentos", "80 Crunch abdominal", "40 Zancadas explosivas", "Sostener peso 2 Min"
-        ],
-        SANTIDAD: [
-            "Ducha agua helada", "Détox digital 2 horas", "Ayuno absoluto 1 hora", "Borrar 50 fotos basura", "Limpiar historial web", "Cero redes sociales hoy", "Leer 20 páginas", "Organizar escritorio", "Meditar 15 min silencio", "No quejarse por 3 horas", "Escribir 3 metas diarias", "Limpiar calzado", "Cero azúcar por 12h", "Lavar platos inmediatamente", "Beber 1L de agua ahora", "Desinstalar app inútil", "Silenciar grupos de WhatsApp", "Planificar semana", "Limpiar teclado y pantalla", "No usar silla por 30 min", "Dormir sin teléfono cerca", "Agradecer 3 cosas", "Tender cama perfecto", "Revisar gastos del mes", "Cero cafeína hoy", "Ducha fría de 5 minutos", "Ayuno de dopamina", "Estudiar algo nuevo 30 min", "Arreglar ropa desordenada", "Silencio total 20 min"
-        ],
-        MENTAL: [
-            {q:"RAÍZ DE 169", a:"13"}, {q:"ORO QUÍMICA", a:"AU"}, {q:"PLANETA 5", a:"JUPITER"}, {q:"CAPITAL FRANCIA", a:"PARIS"}, {q:"AÑO LUNA", a:"1969"}, {q:"PLATA QUÍMICA", a:"AG"}, {q:"RAÍZ 144", a:"12"}, {q:"7 X 8", a:"56"}, {q:"HIERRO QUÍMICA", a:"FE"}, {q:"CAPITAL ITALIA", a:"ROMA"}, {q:"9 X 9", a:"81"}, {q:"RAÍZ 225", a:"15"}, {q:"COBRE QUÍMICA", a:"CU"}, {q:"CAPITAL JAPÓN", a:"TOKIO"}, {q:"DESCUBRIÓ AMÉRICA", a:"COLON"}, {q:"15 X 4", a:"60"}, {q:"GAS NOBLE (HE)", a:"HELIO"}, {q:"RAÍZ 400", a:"20"}, {q:"CAPITAL ESPAÑA", a:"MADRID"}, {q:"MERCURIO QUÍMICA", a:"HG"}, {q:"12 X 12", a:"144"}, {q:"OCÉANO MÁS GRANDE", a:"PACIFICO"}, {q:"RAÍZ 625", a:"25"}, {q:"OXÍGENO QUÍMICA", a:"O"}, {q:"PLANETA ROJO", a:"MARTE"}, {q:"CAPITAL ALEMANIA", a:"BERLIN"}, {q:"AÑO REV. FRANCESA", a:"1789"}, {q:"100 / 4", a:"25"}, {q:"PLOMO QUÍMICA", a:"PB"}, {q:"RAÍZ 81", a:"9"}
-        ]
+    // Imágenes ultra-estables
+    const imgs = {
+        FISICO: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400&q=80",
+        SANTIDAD: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=400&q=80",
+        MENTAL: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80"
     };
 
-    const insultos = ["DECEPCIÓN GENÉTICA", "CEREBRO DE MOSQUITO", "ESCORIA DÉBIL", "BASURA HUMANA", "INÚTIL", "VERGÜENZA MUNDIAL", "ERROR BIOLÓGICO"];
+    const misiones = {
+        FISICO: ["100 SENTADILLAS", "40 BURPEES", "3 MIN PLANCHA", "60 FLEXIONES", "80 MOUNTAIN CLIMBERS"],
+        SANTIDAD: ["DUCHA AGUA HELADA", "DÉTOX DIGITAL", "MEDITACIÓN SILENCIOSA", "LIMPIEZA DE ESPACIO"],
+        MENTAL: [{q:"RAÍZ DE 169", a:"13"}, {q:"ORO EN QUÍMICA", a:"AU"}, {q:"PLANETA 5", a:"JUPITER"}]
+    };
+
+    // Recuperar modo guardado
+    window.onload = () => {
+        const guardado = localStorage.getItem('modo_predicador');
+        if(guardado) {
+            document.getElementById('mode-select').value = guardado;
+            document.getElementById('main-img').src = imgs[guardado];
+        }
+    };
+
+    const actualizarModo = () => {
+        const m = document.getElementById('mode-select').value;
+        localStorage.setItem('modo_predicador', m);
+        document.getElementById('main-img').src = imgs[m];
+        playSound(800, 'sine', 0.1);
+    };
+
+    const reiniciar = () => { location.reload(); };
+
+    document.getElementById('answer-input').oninput = () => { playSound(600, 'sine', 0.05, 0.05); vibra(20); };
+
     let qActiva = null, st, iv;
 
     document.getElementById('b1').onclick = function() {
         playSound(440, 'square', 0.2); vibra(100);
         const m = document.getElementById('mode-select').value;
-        this.style.display = 'none'; document.getElementById('mode-select').style.display = 'none';
-        document.getElementById('b2').style.display = 'block'; document.getElementById('timer').style.display = 'block';
+        this.style.display = 'none'; 
+        document.getElementById('mode-select').style.display = 'none';
+        document.getElementById('b2').style.display = 'block'; 
+        document.getElementById('timer').style.display = 'block';
+
         if(m === 'MENTAL') {
             qActiva = misiones.MENTAL[Math.floor(Math.random()*misiones.MENTAL.length)];
             document.getElementById('msg').innerText = qActiva.q;
-            document.getElementById('answer-input').style.display = 'block'; document.getElementById('answer-input').focus();
-        } else { document.getElementById('msg').innerText = misiones[m][Math.floor(Math.random()*misiones[m].length)]; }
+            document.getElementById('answer-input').style.display = 'block'; 
+            document.getElementById('answer-input').focus();
+        } else { 
+            document.getElementById('msg').innerText = misiones[m][Math.floor(Math.random()*misiones[m].length)]; 
+        }
+
         let s = 0; st = Date.now();
         iv = setInterval(() => {
             s++; let min = Math.floor(s/60), seg = s%60;
@@ -102,9 +129,8 @@
         if(document.getElementById('mode-select').value === 'MENTAL') {
             if(document.getElementById('answer-input').value.toUpperCase().trim() === qActiva.a) { location.reload(); }
             else {
-                const ins = insultos[Math.floor(Math.random()*insultos.length)];
-                playSound(40, 'sawtooth', 2, 0.8); vibra(1000); hablar(ins);
-                document.getElementById('death-msg').innerText = ins;
+                playSound(40, 'sawtooth', 2, 0.8); vibra(1000); hablar("FRACASO HUMANO");
+                document.getElementById('death-msg').innerText = "ERROR DE CÁLCULO";
                 document.getElementById('death-screen').style.display = 'flex';
             }
         } else { location.reload(); }

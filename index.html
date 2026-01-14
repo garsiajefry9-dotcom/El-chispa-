@@ -5,108 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EL SARGENGO</title>
     <style>
-        :root { --bg: #0d0d0d; --military: #ff9800; --danger: #ff0000; --text: #e0e0e0; }
-        body { font-family: 'Courier New', monospace; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .app-container { width: 90%; max-width: 400px; background: #1a1a1a; padding: 25px; border: 3px solid var(--military); text-align: center; }
-        h1 { font-size: 1.8rem; color: var(--military); text-transform: uppercase; margin: 0; border-bottom: 2px solid var(--military); padding-bottom: 10px; }
-        .racha-badge { color: var(--military); font-weight: bold; margin-top: 15px; display: block; }
-        .selector-box { margin: 20px 0; }
-        select { width: 100%; background: #000; color: var(--military); border: 1px solid var(--military); padding: 10px; font-weight: bold; }
-        .reveal-circle { width: 160px; height: 160px; border: 5px double var(--military); margin: 15px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; transition: 0.2s; }
-        #timer { font-size: 2.5rem; font-weight: bold; color: var(--military); display: none; }
-        .btn-main { background: var(--military); color: black; border: none; padding: 18px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; }
-        .btn-done { background: #2e7d32; color: white; display: none; margin-top: 10px; }
-        .susto-flash { background-color: var(--danger) !important; animation: shake 0.1s infinite; }
+        :root { --bg: #0d0d0d; --mil: #ff9800; --danger: #ff0000; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: #eee; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .app { width: 90%; max-width: 380px; background: #1a1a1a; padding: 20px; border: 3px solid var(--mil); text-align: center; }
+        h1 { color: var(--mil); border-bottom: 2px solid var(--mil); padding-bottom: 10px; margin: 0; }
+        .btn { background: var(--mil); color: #000; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+        .box { width: 150px; height: 150px; border: 3px double var(--mil); margin: 20px auto; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        #timer { font-size: 2rem; color: var(--mil); display: none; }
+        .flash { animation: shake 0.1s infinite; background: var(--danger) !important; }
         @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
     </style>
 </head>
 <body>
 
-<div class="app-container" id="main-ui">
+<div class="app" id="ui">
     <h1>EL SARGENGO</h1>
-    <span class="racha-badge">CHISPAS: <span id="racha-count">0</span></span>
+    <p>CHISPAS: <span id="r">0</span></p>
     
-    <div class="selector-box">
-        <select id="categoria-selector">
-            <option value="domesticas">CASA (ORDEN)</option>
-            <option value="ejercicio">CUERPO (SUDOR)</option>
-            <option value="trabajo">MENTE (ENFOQUE)</option>
-        </select>
-    </div>
+    <select id="c" style="width:100%; background:#000; color:var(--mil); padding:10px; border:1px solid var(--mil);">
+        <option value="d">CASA (ORDEN)</option>
+        <option value="e">CUERPO (SUDOR)</option>
+        <option value="t">MENTE (ENFOQUE)</option>
+    </select>
 
-    <div id="revelador" class="reveal-circle">
+    <div class="box">
         <div id="timer">05:00</div>
-        <span id="click-text">ESPERANDO</span>
+        <span id="txt">ESPERANDO</span>
     </div>
 
-    <div id="instruccion" style="margin-bottom:20px; font-size: 0.9rem; font-weight: bold;">¿VAS A MOVERTE?</div>
+    <p id="ins" style="font-weight:bold; min-height:40px;">¿VAS A MOVERTE?</p>
 
-    <button id="btn-revelar" class="btn-main">¡RECIBIR ORDEN!</button>
-    <button id="btn-hecho" class="btn-main btn-done">¡ORDEN CUMPLIDA!</button>
+    <button id="b1" class="btn">¡RECIBIR ORDEN!</button>
+    <button id="b2" class="btn" style="display:none; background:#2e7d32; color:#fff;">¡ORDEN CUMPLIDA!</button>
 </div>
 
 <script>
-    const misionesDB = {
-        domesticas: ["Tira 5 cosas viejas", "Limpia tu escritorio", "Haz tu cama"],
-        ejercicio: ["20 Flexiones ahora", "1 min de plancha", "30 Sentadillas"],
-        trabajo: ["Lee 5 páginas", "Planifica tu día", "Estudia 10 min"]
+    const m = {
+        d: ["LIMPIA TU MESA", "HAZ LA CAMA", "TIRA LA BASURA"],
+        e: ["20 FLEXIONES", "1 MIN PLANCHA", "30 SENTADILLAS"],
+        t: ["LEE 5 PÁGINAS", "PLANIFICA EL DÍA", "ESTUDIA 10 MIN"]
     };
 
-    let racha = localStorage.getItem('sargento_racha') || 0;
-    document.getElementById('racha-count').innerText = racha;
-    let intentosNocturnos = 0;
+    let racha = localStorage.getItem('s_r') || 0;
+    document.getElementById('r').innerText = racha;
+    let n = 0;
 
-    const btnRev = document.getElementById('btn-revelar');
-    const btnDone = document.getElementById('btn-hecho');
-    const timerText = document.getElementById('timer');
-    const instr = document.getElementById('instruccion');
-
-    btnRev.onclick = () => {
-        const hora = new Date().getHours();
+    document.getElementById('b1').onclick = function() {
+        let h = new Date().getHours();
         
-        // Lógica de Susto Nocturno (23:00 a 05:00)
-        if (hora >= 23 || hora < 5) {
-            intentosNocturnos++;
-            if (intentosNocturnos === 1) {
+        // SUSTO NOCTURNO (23:00 a 05:00)
+        if (h >= 23 || h < 5) {
+            n++;
+            if (n === 1) {
                 alert("¿QUÉ HACES DESPIERTO? VE A DORMIR. ÚLTIMO AVISO.");
             } else {
-                document.body.classList.add('susto-flash');
-                document.getElementById('main-ui').style.display = 'none';
+                document.body.classList.add('flash');
+                document.getElementById('ui').style.display = 'none';
                 setTimeout(() => {
                     alert("¡TE DIJE QUE DORMIRAS! RACHA BORRADA.");
-                    localStorage.setItem('sargento_racha', 0);
+                    localStorage.setItem('s_r', 0);
                     location.reload();
                 }, 400);
                 return;
             }
         }
 
-        const cat = document.getElementById('categoria-selector').value;
-        const lista = misionesDB[cat];
-        instr.innerText = lista[Math.floor(Math.random() * lista.length)].toUpperCase();
-        
-        btnRev.style.display = 'none';
-        btnDone.style.display = 'block';
-        timerText.style.display = 'block';
-        document.getElementById('click-text').style.display = 'none';
+        let cat = document.getElementById('c').value;
+        document.getElementById('ins').innerText = m[cat][Math.floor(Math.random()*3)];
+        this.style.display = 'none';
+        document.getElementById('b2').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
+        document.getElementById('txt').style.display = 'none';
         
         let t = 300;
-        const x = setInterval(() => {
-            let m = Math.floor(t/60), s = t%60;
-            timerText.innerText = `${m}:${s<10?'0':''}${s}`;
-            if (--t < 0) {
-                clearInterval(x);
-                alert("¡FRACASASTE! RACHA A CERO.");
-                localStorage.setItem('sargento_racha', 0);
+        setInterval(() => {
+            if(t > 0) {
+                t--;
+                let min = Math.floor(t/60), seg = t%60;
+                document.getElementById('timer').innerText = min + ":" + (seg<10?'0':'') + seg;
+            } else {
+                alert("¡FRACASASTE!");
+                localStorage.setItem('s_r', 0);
                 location.reload();
             }
         }, 1000);
     };
 
-    btnDone.onclick = () => {
-        racha = parseInt(racha) + 1;
-        localStorage.setItem('sargento_racha', racha);
-        alert("BIEN. SIGUE ASÍ.");
+    document.getElementById('b2').onclick = function() {
+        racha++;
+        localStorage.setItem('s_r', racha);
+        alert("BIEN HECHO.");
         location.reload();
     };
 </script>

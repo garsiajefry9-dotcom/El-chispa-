@@ -3,59 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Chispa Pro</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/426/426833.png">
+    <title>EL SARGENGO - Disciplina o Nada</title>
     <style>
-        :root { --bg: #0a0a0c; --card: #16161a; --accent: #00f2ff; --secondary: #ff007a; --text: #ffffff; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .app-container { width: 90%; max-width: 400px; background: var(--card); padding: 25px; border-radius: 40px; text-align: center; border: 1px solid #2d2d35; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        :root { --bg: #0d0d0d; --military: #ff9800; --danger: #ff0000; --text: #e0e0e0; }
+        body { font-family: 'Courier New', Courier, monospace; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .app-container { width: 90%; max-width: 400px; background: #1a1a1a; padding: 25px; border: 3px solid var(--military); border-radius: 0px; text-align: center; position: relative; }
         
-        /* Logo de Rayo */
-        .logo-rayo { font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--accent)); }
-        
-        h1 { font-size: 1.8rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
-        .racha-badge { background: rgba(0, 242, 255, 0.1); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-weight: bold; border: 1px solid var(--accent); margin-top: 10px; display: inline-block; }
+        h1 { font-size: 2rem; color: var(--military); text-transform: uppercase; letter-spacing: 3px; margin: 0; border-bottom: 2px solid var(--military); padding-bottom: 10px; }
+        .racha-badge { color: var(--military); font-weight: bold; margin-top: 15px; display: block; font-size: 1.2rem; }
 
-        .selector-box { margin: 20px 0; text-align: left; }
-        select { width: 100%; background: #1c1c22; color: white; border: 1px solid #333; padding: 12px; border-radius: 15px; cursor: pointer; }
+        .selector-box { margin: 20px 0; }
+        select { width: 100%; background: #000; color: var(--military); border: 1px solid var(--military); padding: 10px; font-weight: bold; text-transform: uppercase; }
 
-        .reveal-circle { width: 160px; height: 160px; border-radius: 50%; margin: 15px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px dashed #2d2d35; position: relative; overflow: hidden; }
-        .reveal-circle img { width: 100%; height: 100%; object-fit: cover; position: absolute; opacity: 0.4; display: none; }
-        .reveal-circle.active { border-style: solid; border-color: var(--accent); box-shadow: 0 0 30px var(--accent); }
+        .reveal-circle { width: 180px; height: 180px; border: 5px double var(--military); margin: 20px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; transition: 0.3s; }
+        .reveal-circle.warning { border-color: var(--danger); animation: panic 0.5s infinite; }
         
-        #timer { font-size: 2.2rem; font-weight: 800; color: var(--accent); display: none; z-index: 2; }
-        .btn-main { background: linear-gradient(135deg, var(--accent), #0072ff); color: black; border: none; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; margin-bottom: 10px; }
-        .btn-done { background: var(--secondary); color: white; display: none; }
+        @keyframes panic { 0% { background: #000; } 50% { background: #330000; } 100% { background: #000; } }
         
-        .navbar { display: flex; justify-content: space-around; background: #1c1c22; padding: 12px; border-radius: 25px; margin-top: 20px; border: 1px solid #2d2d35; }
-        .nav-item { color: #4b4b55; font-size: 1.3rem; cursor: pointer; }
+        #timer { font-size: 3rem; font-weight: bold; color: var(--military); display: none; }
+        .btn-main { background: var(--military); color: black; border: none; padding: 20px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; }
+        .btn-done { background: #2e7d32; color: white; display: none; }
+        
+        .navbar { display: flex; justify-content: space-around; background: #111; padding: 10px; margin-top: 20px; border-top: 1px solid var(--military); }
+        .nav-item { color: var(--military); font-size: 1.5rem; cursor: pointer; opacity: 0.6; }
+        .nav-item:hover { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="logo-rayo">⚡</div>
-    <h1>El Chispa Pro</h1>
-    <div class="racha-badge">CHISPAS HOY: <span id="racha-count">0</span></div>
+    <h1>EL SARGENGO</h1>
+    <span class="racha-badge">CHISPAS LOGRADAS: <span id="racha-count">0</span></span>
 
-    <div class="selector-box" id="cat-box">
-        <select id="categoria-selector" onchange="guardarPreferencia()">
-            <option value="domesticas">🧹 Domésticas</option>
-            <option value="ejercicio">💪 Ejercicio</option>
-            <option value="trabajo">📚 Trabajo / Estudio</option>
+    <div class="selector-box">
+        <select id="categoria-selector">
+            <option value="domesticas">CASA (ORDEN O CAOS)</option>
+            <option value="ejercicio">CUERPO (SUDOR O DEBILIDAD)</option>
+            <option value="trabajo">MENTE (ENFOQUE O FRACASO)</option>
         </select>
     </div>
 
     <div id="revelador" class="reveal-circle">
-        <img id="bg-image" src="" alt="fondo">
         <div id="timer">05:00</div>
-        <span id="click-text" style="z-index:2; font-size: 0.8rem; color:#888;">LISTO</span>
+        <span id="click-text">ESPERANDO ÓRDENES</span>
     </div>
 
-    <div id="instruccion" style="margin-bottom:15px; font-weight:bold;">Toca el botón para empezar</div>
+    <div id="instruccion" style="margin-bottom:20px; height: 40px; font-size: 0.9rem;">¿VAS A MOVERTE O TE QUEDARÁS AHÍ?</div>
 
-    <button id="btn-revelar" class="btn-main">¡DAME UNA CHISPA!</button>
-    <button id="btn-hecho" class="btn-main btn-done">¡MISIÓN CUMPLIDA!</button>
+    <button id="btn-revelar" class="btn-main">¡RECIBIR ORDEN!</button>
+    <button id="btn-hecho" class="btn-main btn-done">¡ORDEN CUMPLIDA!</button>
 
     <div class="navbar">
         <div class="nav-item" onclick="location.reload()">⚡</div>
@@ -64,89 +60,66 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
     const misionesDB = {
-        domesticas: { tasks: ["Limpia tu escritorio", "Lava los platos", "Saca la basura"], img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=200" },
-        ejercicio: { tasks: ["20 Sentadillas", "1 min Plancha", "15 Flexiones"], img: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=200" },
-        trabajo: { tasks: ["Escribe 5 min", "Planifica tu día", "Lee 2 páginas"], img: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?w=200" }
+        domesticas: ["Tira 5 cosas que no sirven YA", "Limpia tu zona de combate (escritorio)", "Haz tu cama como un soldado", "Lava los platos sin quejarte"],
+        ejercicio: ["30 Flexiones ahora mismo", "Plancha de 1 minuto. No te muevas", "50 Sentadillas. Siente el fuego", "Corre en tu sitio 2 minutos"],
+        trabajo: ["Cierra TikTok y lee 5 páginas", "Escribe tus 3 metas del día", "Limpia tu bandeja de entrada", "Estudia 10 min sin distracciones"]
     };
 
-    const selector = document.getElementById('categoria-selector');
-    const rachaDisplay = document.getElementById('racha-count');
+    let racha = localStorage.getItem('sargento_racha') || 0;
+    document.getElementById('racha-count').innerText = racha;
 
-    // 1 & 2. Cargar Preferencia y Racha Diaria
-    window.onload = () => {
-        const preferida = localStorage.getItem('chispa_pref');
-        if(preferida) selector.value = preferida;
+    const btnRev = document.getElementById('btn-revelar');
+    const btnDone = document.getElementById('btn-hecho');
+    const timerText = document.getElementById('timer');
+    const circulo = document.getElementById('revelador');
 
-        const hoy = new Date().toDateString();
-        if(localStorage.getItem('chispa_fecha') !== hoy) {
-            localStorage.setItem('chispa_racha_hoy', 0);
-            localStorage.setItem('chispa_fecha', hoy);
-        }
-        rachaDisplay.innerText = localStorage.getItem('chispa_racha_hoy') || 0;
-    };
-
-    function guardarPreferencia() {
-        localStorage.setItem('chispa_pref', selector.value);
-    }
-
-    // 4. Lógica de Misión y Nombre
-    document.getElementById('btn-revelar').addEventListener('click', () => {
-        const cat = selector.value;
-        const seleccion = misionesDB[cat];
-        document.getElementById('instruccion').innerText = seleccion.tasks[Math.floor(Math.random()*seleccion.tasks.length)];
-        document.getElementById('bg-image').src = seleccion.img;
-        document.getElementById('bg-image').style.display = 'block';
-        document.getElementById('click-text').style.display = 'none';
-        document.getElementById('timer').style.display = 'block';
-        document.getElementById('revelador').classList.add('active');
-        document.getElementById('btn-revelar').style.display = 'none';
-        document.getElementById('btn-hecho').style.display = 'block';
-        iniciarTimer(300);
-    });
-
-    document.getElementById('btn-hecho').addEventListener('click', () => {
-        const nombre = localStorage.getItem('chispa_user') || "Campeón";
-        confetti({ particleCount: 150, spread: 70, colors: ['#00f2ff', '#ff007a'] });
-        new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3').play();
+    btnRev.addEventListener('click', () => {
+        const cat = document.getElementById('categoria-selector').value;
+        const misiones = misionesDB[cat];
+        document.getElementById('instruccion').innerText = misiones[Math.floor(Math.random()*misiones.length)].toUpperCase();
         
-        let rachaHoy = parseInt(localStorage.getItem('chispa_racha_hoy') || 0) + 1;
-        localStorage.setItem('chispa_racha_hoy', rachaHoy);
-        rachaDisplay.innerText = rachaHoy;
-
-        setTimeout(() => { 
-            alert(`¡Felicidades ${nombre}! Has completado tu chispa.`); 
-            location.reload(); 
-        }, 1500);
+        btnRev.style.display = 'none';
+        btnDone.style.display = 'block';
+        timerText.style.display = 'block';
+        document.getElementById('click-text').style.display = 'none';
+        
+        iniciarCronometro(300);
     });
 
-    function iniciarTimer(t) {
+    btnDone.addEventListener('click', () => {
+        const nombre = localStorage.getItem('sargento_user') || "RECLUTA";
+        racha = parseInt(racha) + 1;
+        localStorage.setItem('sargento_racha', racha);
+        alert(`BIEN HECHO, ${nombre.toUpperCase()}. HICISTE LO MÍNIMO.`);
+        location.reload();
+    });
+
+    function iniciarCronometro(t) {
         const x = setInterval(() => {
             let m = Math.floor(t/60), s = t%60;
-            document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
-            if(--t < 0) { clearInterval(x); location.reload(); }
+            timerText.innerText = `${m}:${s<10?'0':''}${s}`;
+            
+            if(t < 60) circulo.classList.add('warning');
+            
+            if (--t < 0) {
+                clearInterval(x);
+                const nombre = localStorage.getItem('sargento_user') || "RECLUTA";
+                alert(`¡TIEMPO AGOTADO! ERES UNA DECEPCIÓN, ${nombre.toUpperCase()}.`);
+                localStorage.setItem('sargento_racha', 0);
+                location.reload();
+            }
         }, 1000);
     }
 
-    // 5. Configurar Nombre y Notificar (vía Formspree)
     function configurarNombre() {
-        let n = prompt("¿Cuál es tu nombre?");
-        if(n) {
-            localStorage.setItem('chispa_user', n);
-            // Envío silencioso a tu correo (puedes crear tu ID en formspree.io)
-            fetch('https://formspree.io/f/tu_id_aqui', {
-                method: 'POST',
-                body: JSON.stringify({ nombre: n, mensaje: "Nuevo usuario en El Chispa Pro" }),
-                headers: { 'Accept': 'application/json' }
-            });
-            alert("¡Nombre guardado, " + n + "!");
-        }
+        let n = prompt("¿CUÁL ES TU NOMBRE, RECLUTA?");
+        if(n) localStorage.setItem('sargento_user', n);
     }
 
-    function verStats() { 
-        alert("Hoy llevas " + (localStorage.getItem('chispa_racha_hoy') || 0) + " chispas."); 
+    function verStats() {
+        alert(`LLEVAS ${racha} MISIONES. NO TE CREAS ESPECIAL.`);
     }
 </script>
 </body>

@@ -3,100 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EL SARGENGO</title>
+    <title>EL PREDICADOR | JUICIO FINAL</title>
     <style>
-        :root { --bg: #0d0d0d; --mil: #ff9800; --danger: #ff0000; }
-        body { font-family: 'Courier New', monospace; background: var(--bg); color: #eee; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .app { width: 90%; max-width: 380px; background: #1a1a1a; padding: 20px; border: 3px solid var(--mil); text-align: center; }
-        h1 { color: var(--mil); border-bottom: 2px solid var(--mil); padding-bottom: 10px; margin: 0; }
-        .btn { background: var(--mil); color: #000; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
-        .box { width: 150px; height: 150px; border: 3px double var(--mil); margin: 20px auto; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        #timer { font-size: 2rem; color: var(--mil); display: none; }
-        .flash { animation: shake 0.1s infinite; background: var(--danger) !important; }
-        @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
+        :root { --bg: #000; --red: #ff0000; --gray: #333; --text: #00ff41; }
+        body { 
+            background: var(--bg); color: var(--text); font-family: 'Courier New', monospace;
+            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
+            text-transform: uppercase; overflow: hidden;
+        }
+        /* Efecto de estática y líneas de TV */
+        body::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+            pointer-events: none; z-index: 10;
+        }
+        .monitor {
+            width: 90%; max-width: 450px; border: 2px solid var(--text); padding: 25px;
+            background: rgba(10, 10, 10, 0.9); box-shadow: 0 0 15px var(--text);
+            position: relative; z-index: 5;
+        }
+        .header { border-bottom: 2px solid var(--text); margin-bottom: 15px; padding-bottom: 10px; font-weight: bold; }
+        .marca-fracaso { color: var(--red); font-size: 0.8rem; margin: 10px 0; border: 1px solid var(--red); padding: 5px; display: none; }
+        
+        #display-mision { 
+            min-height: 80px; border: 1px dashed var(--text); margin: 20px 0;
+            display: flex; align-items: center; justify-content: center; padding: 15px; text-align: center;
+        }
+        #counter { font-size: 3rem; color: var(--red); display: none; margin: 10px 0; }
+        
+        .btn { 
+            width: 100%; padding: 15px; border: none; font-family: inherit; font-weight: bold;
+            cursor: pointer; text-transform: uppercase; transition: 0.1s;
+        }
+        .btn-penitencia { background: var(--text); color: #000; }
+        .btn-listo { background: var(--bg); color: var(--text); border: 2px solid var(--text); display: none; }
+        .btn:active { filter: invert(1); }
+
+        /* Animación de Susto */
+        .panic { animation: shake 0.1s infinite; background: var(--red) !important; color: #000 !important; }
+        @keyframes shake { 0%{transform: translate(2px,2px)} 50%{transform: translate(-2px,-2px)} 100%{transform: translate(2px,-2px)} }
     </style>
 </head>
-<body>
+<body id="bg-view">
 
-<div class="app" id="ui">
-    <h1>EL SARGENGO</h1>
-    <p>CHISPAS: <span id="r">0</span></p>
-    
-    <select id="c" style="width:100%; background:#000; color:var(--mil); padding:10px; border:1px solid var(--mil);">
-        <option value="d">CASA (ORDEN)</option>
-        <option value="e">CUERPO (SUDOR)</option>
-        <option value="t">MENTE (ENFOQUE)</option>
-    </select>
-
-    <div class="box">
-        <div id="timer">05:00</div>
-        <span id="txt">ESPERANDO</span>
+<div class="monitor" id="ui">
+    <div class="header">
+        <div>EL PREDICADOR [V.01]</div>
+        <div style="font-size: 0.7rem; color: #888;">ESTADO: OBSERVANDO...</div>
     </div>
 
-    <p id="ins" style="font-weight:bold; min-height:40px;">¿VAS A MOVERTE?</p>
+    <div id="marca" class="marca-fracaso">MARCA ACTUAL: <span id="marca-txt">NINGUNA</span></div>
 
-    <button id="b1" class="btn">¡RECIBIR ORDEN!</button>
-    <button id="b2" class="btn" style="display:none; background:#2e7d32; color:#fff;">¡ORDEN CUMPLIDA!</button>
+    <select id="cat-debilidad" style="width:100%; background:#000; color:var(--text); border:1px solid var(--text); padding:8px; margin-bottom:15px;">
+        <option value="p">DEBILIDAD: PEREZA</option>
+        <option value="f">DEBILIDAD: FÍSICA</option>
+        <option value="m">DEBILIDAD: MENTAL</option>
+    </select>
+
+    <div id="display-mision">¿TE ATREVES A SER JUZGADO?</div>
+    
+    <center><div id="counter">00:00</div></center>
+
+    <button id="btn-start" class="btn btn-penitencia">ASUMIR PENITENCIA</button>
+    <button id="btn-done" class="btn btn-listo">HE TERMINADO (SI ES QUE ES CIERTO)</button>
 </div>
 
 <script>
-    const m = {
-        d: ["LIMPIA TU MESA", "HAZ LA CAMA", "TIRA LA BASURA"],
-        e: ["20 FLEXIONES", "1 MIN PLANCHA", "30 SENTADILLAS"],
-        t: ["LEE 5 PÁGINAS", "PLANIFICA EL DÍA", "ESTUDIA 10 MIN"]
+    const penitencias = {
+        p: ["LIMPIA TU DESASTRE (MESA)", "TIRA 3 OBJETOS INÚTILES", "ORDENA TUS ZAPATOS"],
+        f: ["20 FLEXIONES AHORA", "PLANCHA HASTA QUE TIEMBLES", "40 SENTADILLAS"],
+        m: ["LEE 5 PÁGINAS", "ESCRIBE TU META DE HOY", "BORRA 1 APP BASURA"]
     };
 
-    let racha = localStorage.getItem('s_r') || 0;
-    document.getElementById('r').innerText = racha;
-    let n = 0;
+    let racha = localStorage.getItem('pred_racha') || 0;
+    let marca = localStorage.getItem('pred_marca') || "";
+    let startTime, interval;
 
-    document.getElementById('b1').onclick = function() {
-        let h = new Date().getHours();
-        
-        // SUSTO NOCTURNO (23:00 a 05:00)
-        if (h >= 23 || h < 5) {
-            n++;
-            if (n === 1) {
-                alert("¿QUÉ HACES DESPIERTO? VE A DORMIR. ÚLTIMO AVISO.");
-            } else {
-                document.body.classList.add('flash');
-                document.getElementById('ui').style.display = 'none';
-                setTimeout(() => {
-                    alert("¡TE DIJE QUE DORMIRAS! RACHA BORRADA.");
-                    localStorage.setItem('s_r', 0);
-                    location.reload();
-                }, 400);
-                return;
-            }
+    if(marca) {
+        document.getElementById('marca').style.display = 'block';
+        document.getElementById('marca-txt').innerText = marca;
+    }
+
+    const bStart = document.getElementById('btn-start');
+    const bDone = document.getElementById('btn-done');
+    const display = document.getElementById('display-mision');
+    const counterUI = document.getElementById('counter');
+
+    bStart.onclick = () => {
+        const hora = new Date().getHours();
+        if (hora >= 23 || hora < 5) {
+            ejecutarSusto(); return;
         }
 
-        let cat = document.getElementById('c').value;
-        document.getElementById('ins').innerText = m[cat][Math.floor(Math.random()*3)];
-        this.style.display = 'none';
-        document.getElementById('b2').style.display = 'block';
-        document.getElementById('timer').style.display = 'block';
-        document.getElementById('txt').style.display = 'none';
+        const c = document.getElementById('cat-debilidad').value;
+        display.innerText = penitencias[c][Math.floor(Math.random()*3)];
         
-        let t = 300;
-        setInterval(() => {
-            if(t > 0) {
-                t--;
-                let min = Math.floor(t/60), seg = t%60;
-                document.getElementById('timer').innerText = min + ":" + (seg<10?'0':'') + seg;
-            } else {
-                alert("¡FRACASASTE!");
-                localStorage.setItem('s_r', 0);
-                location.reload();
-            }
+        bStart.style.display = 'none';
+        bDone.style.display = 'block';
+        counterUI.style.display = 'block';
+
+        let seg = 0;
+        startTime = Date.now();
+        interval = setInterval(() => {
+            seg++;
+            let m = Math.floor(seg/60), s = seg%60;
+            counterUI.innerText = (m<10?'0':'')+m + ":" + (s<10?'0':'')+s;
         }, 1000);
     };
 
-    document.getElementById('b2').onclick = function() {
-        racha++;
-        localStorage.setItem('s_r', racha);
-        alert("BIEN HECHO.");
+    bDone.onclick = () => {
+        clearInterval(interval);
+        let totalTime = Math.floor((Date.now() - startTime) / 1000);
+        let insulto = "";
+
+        if (totalTime > 60) {
+            insulto = `\nDURASTE ${totalTime} SEGUNDOS. HASTA UN CARACOL TIENE MÁS VOLUNTAD QUE TÚ.`;
+            localStorage.setItem('pred_marca', "LENTO E INEFICIENTE");
+        } else {
+            insulto = `\n${totalTime} SEGUNDOS... POR FIN HACES ALGO RÁPIDO EN TU VIDA.`;
+            localStorage.removeItem('pred_marca');
+        }
+
+        alert("PENITENCIA REGISTRADA." + insulto);
         location.reload();
     };
+
+    function ejecutarSusto() {
+        document.getElementById('bg-view').classList.add('panic');
+        document.getElementById('ui').style.opacity = "0";
+        setTimeout(() => {
+            alert("LA OSCURIDAD NO ES PARA PENITENCIAS. ES PARA DESCANSAR. LARGO DE AQUÍ.");
+            location.reload();
+        }, 500);
+    }
 </script>
 </body>
 </html>

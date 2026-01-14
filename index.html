@@ -6,42 +6,43 @@
     <title>EL PREDICADOR | ELITE SYSTEM</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
-        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
         #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; padding: 20px; flex-direction: column; animation: pulse 0.1s infinite; }
         @keyframes pulse { 0% { background: #f00; } 50% { background: #600; } 100% { background: #f00; } }
         .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; position: relative; box-shadow: 0 0 30px rgba(0,255,65,0.4); text-align: center; }
-        .boss-img { width: 100%; height: 180px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; box-shadow: 0 0 15px var(--main); }
-        #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 10px 0; font-weight: 900; text-shadow: 0 0 10px var(--fail); }
-        .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; }
+        .boss-img { width: 100%; height: 180px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; box-shadow: 0 0 15px var(--main); background: #111; }
+        #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 10px 0; font-weight: 900; }
+        .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-p { background: var(--main); color: #000; }
         .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
-        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 15px; box-sizing: border-box; margin-top: 10px; text-align: center; font-size: 1.2rem; }
-        select { width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; font-family: inherit; font-weight: bold; }
-        .status-bar { font-size: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--main); padding-bottom: 5px; margin-bottom: 10px; letter-spacing: 2px; }
+        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 15px; box-sizing: border-box; margin-top: 10px; text-align: center; font-size: 1.2rem; outline: none; }
+        .status-bar { font-size: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--main); padding-bottom: 5px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div id="death-screen">
-    <h1 style="font-size: 2.2rem; margin-bottom: 10px;">FRACASO ABSOLUTO</h1>
+    <h1 style="font-size: 2.2rem;">FRACASO ABSOLUTO</h1>
     <p id="death-msg"></p>
     <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 40px; border:3px solid #fff; margin-top: 20px;">REINTENTAR</button>
 </div>
 
 <div class="frame">
-    <div class="status-bar"><span>PREDICADOR OS</span><span>V.13 SOMBRÍO</span></div>
+    <div class="status-bar"><span>PREDICADOR OS</span><span>V.14 FINAL</span></div>
     <img id="main-img" src="https://files.oaiusercontent.com/file-78U7vXm9z3V5C2fD6T1K4L?se=2024-05-23T15%3A20%3A22Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3Dpredicador_ojo.webp" class="boss-img">
 
-    <select id="mode-select">
+    <select id="mode-select" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:10px;">
         <option value="FISICO">ENTRENAMIENTO ESPARTANO</option>
         <option value="SANTIDAD">SANTIDAD DE HIERRO</option>
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
 
-    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-size: 1.1rem; font-weight: bold;">SELECCIONA TU JUICIO.</div>
-    <input type="text" id="answer-input" placeholder="RESPUESTA AQUÍ">
+    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold;">SELECCIONA TU PENITENCIA.</div>
+    
+    <input type="text" id="answer-input" placeholder="ESCRIBE AQUÍ">
     <div id="timer">00:00</div>
-    <button id="b1" class="btn btn-p">ASUMIR PENITENCIA</button>
+    
+    <button id="b1" class="btn btn-p">ASUMIR JUICIO</button>
     <button id="b2" class="btn btn-l">MARCAR CUMPLIMIENTO</button>
 </div>
 
@@ -49,53 +50,39 @@
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const vibra = (ms) => { if(navigator.vibrate) navigator.vibrate(ms); }
     
-    // Función de voz ultra tenebrosa
-    const hablar = (texto) => {
-        const msg = new SpeechSynthesisUtterance(texto);
-        msg.lang = 'es-ES';
-        msg.pitch = 0.1; // Lo más grave posible
-        msg.rate = 0.7;  // Más lento para mayor impacto
-        msg.volume = 1;
-        window.speechSynthesis.speak(msg);
+    const playSound = (freq, type, dur, vol = 0.1) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(vol, audioCtx.currentTime);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + dur);
     };
 
-    const sound = (freq, type, duration, volume = 0.1) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    const hablar = (t) => {
+        const m = new SpeechSynthesisUtterance(t);
+        m.lang = 'es-ES'; m.pitch = 0.1; m.rate = 0.6;
+        window.speechSynthesis.speak(m);
     };
 
-    const imgModos = {
-        FISICO: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400",
-        SANTIDAD: "https://images.unsplash.com/photo-1512438248406-306688f34604?q=80&w=400",
-        MENTAL: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=400"
+    // Sonido al escribir
+    document.getElementById('answer-input').oninput = () => {
+        playSound(600, 'sine', 0.05, 0.05);
+        vibra(20);
     };
 
     const misiones = {
-        FISICO: ["HAZ 40 BURPEES", "100 SENTADILLAS", "3 MIN PLANCHA", "50 FLEXIONES"],
-        SANTIDAD: ["DUCHA DE AGUA HELADA", "DÉTOX DIGITAL TOTAL", "MEDITACIÓN RÍGIDA", "AYUNO TOTAL"],
-        MENTAL: [{q:"RAÍZ DE 169", a:"13"}, {q:"ORO EN QUÍMICA", a:"AU"}, {q:"PLANETA 5", a:"JUPITER"}]
+        FISICO: ["40 BURPEES", "100 SENTADILLAS", "3 MIN PLANCHA"],
+        SANTIDAD: ["DUCHA AGUA HELADA", "DÉTOX DIGITAL", "AYUNO TOTAL"],
+        MENTAL: [{q:"RAÍZ DE 169", a:"13"}, {q:"ORO (QUÍMICA)", a:"AU"}, {q:"PLANETA 5", a:"JUPITER"}]
     };
 
-    const insultos = ["ERES UNA DECEPCIÓN GENÉTICA", "TIENES CEREBRO DE MOSQUITO", "ERES UNA ESCORIA DÉBIL", "VERGÜENZA PARA TU LINAJE"];
+    const insultos = ["DECEPCIÓN GENÉTICA", "CEREBRO DE MOSQUITO", "ESCORIA DÉBIL"];
     let qActiva = null, st, iv;
 
     document.getElementById('b1').onclick = function() {
-        if (new Date().getHours() >= 23 || new Date().getHours() < 5) {
-            const txt = "EL PREDICADOR NO DUERME. DUERME O SUFRE.";
-            hablar(txt);
-            document.getElementById('death-msg').innerText = txt;
-            document.getElementById('death-screen').style.display = 'flex';
-            return;
-        }
-        
+        playSound(440, 'square', 0.2); vibra(100);
         const m = document.getElementById('mode-select').value;
-        document.getElementById('main-img').src = imgModos[m];
         this.style.display = 'none';
         document.getElementById('mode-select').style.display = 'none';
         document.getElementById('b2').style.display = 'block';
@@ -115,7 +102,7 @@
             s++;
             let min = Math.floor(s/60), seg = s%60;
             document.getElementById('timer').innerText = (min<10?'0':'')+min+":"+(seg<10?'0':'')+seg;
-            if(s > 60) { sound(100, 'sawtooth', 0.1, 0.2); vibra(50); }
+            if(s > 60) { playSound(100, 'sawtooth', 0.1, 0.1); }
         }, 1000);
     };
 
@@ -123,24 +110,18 @@
         clearInterval(iv);
         const m = document.getElementById('mode-select').value;
         const t = Math.floor((Date.now() - st) / 1000);
-        const insulto = insultos[Math.floor(Math.random()*insultos.length)];
 
         if(m === 'MENTAL') {
             if(document.getElementById('answer-input').value.toUpperCase().trim() === qActiva.a) {
-                alert("SIGUES SIENDO ÚTIL."); location.reload();
+                playSound(880, 'sine', 0.5); location.reload();
             } else {
-                sound(40, 'sawtooth', 2, 0.6); vibra(1000);
-                hablar(insulto);
-                document.getElementById('death-msg').innerText = insulto;
+                const ins = insultos[Math.floor(Math.random()*insultos.length)];
+                playSound(40, 'sawtooth', 2, 0.8); vibra(1000);
+                hablar(ins);
+                document.getElementById('death-msg').innerText = ins;
                 document.getElementById('death-screen').style.display = 'flex';
-                localStorage.clear();
             }
-        } else {
-            if(t > 60) {
-                hablar("MUY LENTO");
-                alert("FRACASO POR LENTITUD."); location.reload();
-            } else { location.reload(); }
-        }
+        } else { location.reload(); }
     };
 </script>
 </body>

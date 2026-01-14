@@ -3,38 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PREDICADOR OS | V.26 GOLD & NIGHT</title>
+    <title>PREDICADOR OS | V.27 INFINITE</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; --gold: #ffd700; }
-        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 15px; text-transform: uppercase; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
-        
-        /* Modo Dorado */
-        .gold-mode { --main: var(--gold); background: #1a1a00 !important; }
-        /* Modo Nocturno */
-        .night-mode { background: #000; border-color: #555; filter: contrast(1.2) brightness(0.8); }
-
-        .frame { width: 100%; max-width: 380px; border: 2px solid var(--main); padding: 15px; background: #050505; box-shadow: 0 0 20px rgba(0,255,65,0.3); position: relative; transition: 0.5s; }
-        .frame.gold-border { border-color: var(--gold); box-shadow: 0 0 40px var(--gold); }
-        
-        .boss-img { width: 100%; height: 160px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 10px; transition: 0.5s; }
+        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 15px; text-transform: uppercase; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; transition: 0.8s; }
+        .gold-mode { --main: var(--gold); background: #1a1500 !important; }
+        .night-mode { filter: contrast(1.3) brightness(0.7); background: #000500; }
+        .frame { width: 100%; max-width: 380px; border: 2px solid var(--main); padding: 15px; background: #050505; box-shadow: 0 0 20px rgba(0,255,65,0.2); position: relative; transition: 0.5s; }
+        .frame.gold-border { border-color: var(--gold); box-shadow: 0 0 50px var(--gold); }
+        .boss-img { width: 100%; height: 150px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 10px; }
         #timer { font-size: 3.5rem; color: var(--fail); margin: 10px 0; font-weight: 900; display: none; text-shadow: 0 0 10px #f00; }
         .status { font-size: 0.7rem; display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--main); padding-bottom: 5px; }
-        
         .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 1rem; }
         .btn-p { background: var(--main); color: #000; }
         .btn-l { background: #000; color: var(--main); border: 2px solid var(--main); display: none; }
-        
-        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; box-sizing: border-box; text-align: center; font-size: 1.2rem; }
-        
-        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; animation: shake 0.1s infinite, flash 0.2s infinite; color: #000; }
-        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; text-align: center; font-size: 1.2rem; outline: none; }
+        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; animation: shake 0.1s infinite; color: #000; }
         @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
     </style>
 </head>
 <body>
 
 <div id="death-screen">
-    <h1 id="d-title" style="font-size: 3rem; margin:0;">FRACASO</h1>
+    <h1 id="d-title" style="font-size: 3rem; margin:0;">ERROR</h1>
     <p id="d-msg" style="font-weight: 900; padding: 20px;"></p>
     <button class="btn" style="background:#000; color:#fff; width: 80%; border: 3px solid #fff;" onclick="location.reload()">REINTENTAR</button>
 </div>
@@ -42,22 +33,17 @@
 <div class="frame" id="main-frame">
     <div class="status">
         <span>RACHA: <b id="streak-val">0</b></span>
-        <span id="night-indicator"></span>
+        <span id="night-tag"></span>
     </div>
-    
-    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400" class="boss-img" id="eye-img">
-
+    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400" class="boss-img">
     <select id="mode" onchange="clickSound()" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:10px;">
         <option value="FISICO">ENTRENAMIENTO ESPARTANO</option>
         <option value="SANTIDAD">SANTIDAD DE HIERRO</option>
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
-
-    <div id="msg" style="min-height: 70px; margin: 10px 0; border: 1px dashed #333; display: flex; align-items: center; justify-content: center; padding: 10px;">EL OJO TE OBSERVA...</div>
-    
+    <div id="msg" style="min-height: 80px; margin: 10px 0; border: 1px dashed #333; display: flex; align-items: center; justify-content: center; padding: 10px; font-size: 0.85rem;">EL PREDICADOR TE ESPERA.</div>
     <input type="text" id="answer-input" placeholder="ESCRIBE">
     <div id="timer">00:00</div>
-    
     <button id="b-start" class="btn btn-p" onclick="startTask()">INICIAR JUICIO</button>
     <button id="b-done" class="btn btn-l" onclick="endTask()">CUMPLIDO</button>
 </div>
@@ -66,29 +52,35 @@
     let racha = 0; let tInicio = 0; let intv; let qA = null;
     const aCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+    const db = {
+        FISICO: ["100 Flexiones", "50 Burpees", "3 Min Plancha", "80 Sentadillas", "60 Fondos Tríceps", "100 Mountain Climbers", "4 Min Wall Sit", "50 Zancadas Expl.", "70 Abdominales", "30 Dominadas/Remo", "150 Saltos Cuerda", "5 Min Estiramiento Activo", "40 Salto al Cajón", "60 Flexiones Diamante", "100 Puñetazos Sombra"],
+        SANTIDAD: ["Ducha Agua Helada", "1 Hora Sin Móvil", "Limpiar Habitación Ya", "Ayuno Dopamina", "Cero Azúcar Hoy", "Meditar 10 Minutos", "Leer 20 Páginas", "Planificar Mañana", "Cero Redes Sociales", "Escribir Diario Éxitos", "Beber 1L Agua Ya", "Cero Quejas Hoy", "Levantarse Sin Posponer", "Ayuno Intermitente 16h"],
+        MENTAL: [
+            {q:"7 X 8 X 2", a:"112"}, {q:"RAÍZ 225", a:"15"}, {q:"ORO (SIMBOLO)", a:"AU"},
+            {q:"CONTINENTE 4 (ALFAB)", a:"EUROPA"}, {q:"15% DE 200", a:"30"}, {q:"PLANETA 6", a:"SATURNO"},
+            {q:"CANTIDAD HUESOS", a:"206"}, {q:"SIMBOLO PLATA", a:"AG"}, {q:"RAIZ 625", a:"25"},
+            {q:"12 X 12", a:"144"}, {q:"AÑO DESC. AMERICA", a:"1492"}, {q:"GAS VITAL (SIMB)", a:"O"}
+        ]
+    };
+
     const clickSound = () => {
         const o = aCtx.createOscillator(); const g = aCtx.createGain();
-        o.type = 'sine'; o.frequency.setValueAtTime(800, aCtx.currentTime);
-        g.gain.setValueAtTime(0.05, aCtx.currentTime);
+        o.type = 'sine'; o.frequency.setValueAtTime(900, aCtx.currentTime);
+        g.gain.setValueAtTime(0.03, aCtx.currentTime);
         o.connect(g); g.connect(aCtx.destination);
         o.start(); o.stop(aCtx.currentTime + 0.02);
     };
 
-    const checkNight = () => {
-        const hour = new Date().getHours();
-        if (hour >= 22 || hour < 6) {
+    window.onload = () => {
+        const h = new Date().getHours();
+        if(h >= 22 || h < 6) {
             document.body.classList.add('night-mode');
-            document.getElementById('night-indicator').innerText = "🌙 MODO NOCTURNO";
-            return true;
+            document.getElementById('night-tag').innerText = "🌙 NOCTURNO";
         }
-        return false;
     };
 
-    window.onload = checkNight;
-
     function startTask() {
-        clickSound();
-        tInicio = Date.now();
+        clickSound(); tInicio = Date.now();
         const m = document.getElementById('mode').value;
         document.getElementById('b-start').style.display = 'none';
         document.getElementById('mode').style.display = 'none';
@@ -96,12 +88,12 @@
         document.getElementById('timer').style.display = 'block';
 
         if(m === 'MENTAL') {
-            qA = {q:"RAÍZ 196", a:"14"};
+            qA = db.MENTAL[Math.floor(Math.random()*db.MENTAL.length)];
             document.getElementById('msg').innerText = qA.q;
             document.getElementById('answer-input').style.display = 'block';
             document.getElementById('answer-input').focus();
         } else {
-            document.getElementById('msg').innerText = "50 BURPEES";
+            document.getElementById('msg').innerText = db[m][Math.floor(Math.random()*db[m].length)];
         }
 
         intv = setInterval(() => {
@@ -112,33 +104,21 @@
     }
 
     function endTask() {
-        clickSound();
-        clearInterval(intv);
+        clickSound(); clearInterval(intv);
         const sTotal = (Date.now() - tInicio)/1000;
-        const isNight = checkNight();
+        const mode = document.getElementById('mode').value;
 
-        if(sTotal < 10) {
-            muerte("MENTIROSO", isNight ? "LAS SOMBRAS NO OCULTAN TU TRAMPA." : "LA TRAMPA ES DEBILIDAD.");
-            return;
-        }
+        if(mode !== 'MENTAL' && sTotal < 10) { muerte("MENTIROSO", "INTENTASTE ENGAÑAR AL OJO."); return; }
+        if(mode === 'MENTAL' && document.getElementById('answer-input').value.trim().toUpperCase() !== qA.a) { muerte("FALLO MENTAL", "CEREBRO DEFECTUOSO."); return; }
 
-        racha++;
-        document.getElementById('streak-val').innerText = racha;
-
+        racha++; document.getElementById('streak-val').innerText = racha;
         if(racha >= 5) {
             document.body.classList.add('gold-mode');
             document.getElementById('main-frame').classList.add('gold-border');
-            const u = new SpeechSynthesisUtterance("HAS SIDO RECONOCIDO.");
+            const u = new SpeechSynthesisUtterance("ERES UN ELEGIDO.");
             u.pitch = 0.8; window.speechSynthesis.speak(u);
         }
-
-        // Reset
-        document.getElementById('b-start').style.display = 'block';
-        document.getElementById('mode').style.display = 'block';
-        document.getElementById('b-done').style.display = 'none';
-        document.getElementById('timer').style.display = 'none';
-        document.getElementById('answer-input').style.display = 'none';
-        document.getElementById('msg').innerText = "SIGUE ENTRENANDO.";
+        resetUI();
     }
 
     function muerte(t, msg) {
@@ -147,7 +127,17 @@
         document.getElementById('death-screen').style.display = 'flex';
         if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
         const u = new SpeechSynthesisUtterance(t + ". " + msg);
-        u.lang = 'es-ES'; u.pitch = 0.1; window.speechSynthesis.speak(u);
+        u.lang = 'es-ES'; u.pitch = 0.1; u.rate = 0.6; window.speechSynthesis.speak(u);
+    }
+
+    function resetUI() {
+        document.getElementById('b-start').style.display = 'block';
+        document.getElementById('mode').style.display = 'block';
+        document.getElementById('b-done').style.display = 'none';
+        document.getElementById('timer').style.display = 'none';
+        document.getElementById('answer-input').style.display = 'none';
+        document.getElementById('answer-input').value = "";
+        document.getElementById('msg').innerText = "REGISTRADO. SIGUIENTE RETO.";
     }
 
     document.getElementById('answer-input').onkeydown = clickSound;

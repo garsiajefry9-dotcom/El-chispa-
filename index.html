@@ -3,105 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EL PREDICADOR | HISTORIAL DE FALLOS</title>
+    <title>EL PREDICADOR | V.04 FINAL</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
-        body { 
-            background: var(--bg); color: var(--main); font-family: 'Courier New', monospace;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
-            text-transform: uppercase; overflow-x: hidden;
-        }
-        body::after {
-            content: ""; position: fixed; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%), linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01));
-            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100;
-        }
-        .frame { 
-            width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; 
-            background: #050505; box-shadow: 0 0 15px rgba(0,255,65,0.2); margin: 20px;
-        }
-        .marca { color: var(--fail); border: 1px solid var(--fail); padding: 5px; margin: 10px 0; font-size: 0.7rem; display: none; }
-        #msg { height: 100px; border: 1px dashed var(--main); display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; margin: 15px 0; font-weight: bold; }
-        #timer { font-size: 3.5rem; color: var(--fail); display: none; text-shadow: 0 0 10px var(--fail); }
-        .btn { width: 100%; padding: 15px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; }
+        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
+        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; padding: 20px; flex-direction: column; }
+        #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 999; justify-content: center; align-items: center; }
+        .alert-box { width: 85%; max-width: 320px; border: 4px solid var(--fail); background: #110000; padding: 25px; text-align: center; box-shadow: 0 0 40px var(--fail); }
+        .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; position: relative; }
+        #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 15px 0; font-weight: 900; }
+        .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-p { background: var(--main); color: #000; }
         .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
-        .historial { margin-top: 20px; border-top: 1px solid var(--main); padding-top: 10px; font-size: 0.7rem; }
-        .falla-item { color: var(--fail); margin-bottom: 3px; border-left: 2px solid var(--fail); padding-left: 5px; }
     </style>
 </head>
 <body>
 
-<div class="frame" id="ui">
-    <div style="font-weight: 900; border-bottom: 1px solid var(--main); padding-bottom: 5px;">EL PREDICADOR [LOG DE INCOMPETENCIA]</div>
-    <div id="m" class="marca">ESTADO: <span id="mt">NINGUNO</span></div>
-    
-    <select id="s" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); margin-top: 15px; padding: 5px;">
-        <option value="p">PEREZA CRÓNICA</option>
-        <option value="f">DEBILIDAD FÍSICA</option>
-        <option value="m">BLOQUEO MENTAL</option>
-    </select>
+<div id="death-screen">
+    <h1 style="font-size: 2.5rem; margin: 0;">VOLVISTE A FRACASAR</h1>
+    <p style="font-size: 1.2rem;">(RACHA ELIMINADA, PERDEDOR)</p>
+    <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:10px 30px; border:2px solid #fff;">REINTENTAR DESDE LA NADA</button>
+</div>
 
-    <div id="msg">SISTEMA LISTO. TE ESTOY OBSERVANDO.</div>
-    <center><div id="timer">00:00</div></center>
-
-    <button id="b1" class="btn btn-p">ASUMIR PENITENCIA</button>
-    <button id="b2" class="btn btn-l">MARCAR COMO CUMPLIDO</button>
-
-    <div class="historial">
-        <div style="margin-bottom: 5px; color: #888;">REGISTRO DE FALLOS RECIENTES:</div>
-        <div id="log-lista">NINGUNO. POR AHORA.</div>
+<div id="custom-alert">
+    <div class="alert-box">
+        <div style="color:var(--fail); font-size:1.5rem; margin-bottom:15px; font-weight:900;">ALERTA DE SISTEMA</div>
+        <div id="alert-text" style="color: #fff; margin-bottom: 25px; font-weight: bold;"></div>
+        <button id="alert-btn" class="btn" style="background: var(--fail); color: #fff;">ACEPTAR SENTENCIA</button>
     </div>
 </div>
 
+<div class="frame">
+    <div style="font-weight: 900; border-bottom: 1px solid var(--main); padding-bottom: 5px; display: flex; justify-content: space-between;">
+        <span>PREDICADOR V.04</span>
+        <span id="status-tag" style="color:var(--main)">VIGILANDO</span>
+    </div>
+    <div id="msg" style="height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 15px 0; border: 1px dashed var(--main); padding:10px;">PREPÁRATE PARA EL JUICIO...</div>
+    <center><div id="timer">00:00</div></center>
+    <button id="b1" class="btn btn-p">ASUMIR PENITENCIA</button>
+    <button id="b2" class="btn btn-l">MARCAR CUMPLIMIENTO</button>
+</div>
+
 <script>
-    const pen = {
-        p: ["LIMPIA TU MESA AHORA", "TIRA LA BASURA", "ORDENA TU ROPA"],
-        f: ["25 FLEXIONES", "1 MIN PLANCHA", "40 SENTADILLAS"],
-        m: ["LEE 5 PÁGINAS", "ESCRIBE TUS METAS", "BORRA 1 APP BASURA"]
-    };
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function vibra(ms) { if(navigator.vibrate) navigator.vibrate(ms); }
 
-    let st, iv, marca = localStorage.getItem('p_m') || "";
-    let fallos = JSON.parse(localStorage.getItem('p_fallos')) || [];
-
-    function actualizarInterfaz() {
-        if(marca) { document.getElementById('m').style.display='block'; document.getElementById('mt').innerText=marca; }
-        const lista = document.getElementById('log-lista');
-        if(fallos.length > 0) {
-            lista.innerHTML = fallos.map(f => `<div class="falla-item"> > FALLO: ${f.t}s - ${f.d}</div>`).join('');
-        }
+    function sound(f, t, d, v=0.1) {
+        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+        g.gain.setValueAtTime(v, audioCtx.currentTime);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + d);
     }
-    actualizarInterfaz();
+
+    function playPanic() {
+        let i = 0;
+        const interval = setInterval(() => {
+            if(i > 10) clearInterval(interval);
+            sound(i % 2 === 0 ? 150 : 100, 'sawtooth', 0.2, 0.2);
+            vibra(100); i++;
+        }, 300);
+    }
+
+    function customAlert(txt, nextAction) {
+        document.getElementById('alert-text').innerText = txt;
+        document.getElementById('custom-alert').style.display = 'flex';
+        document.getElementById('alert-btn').onclick = () => {
+            document.getElementById('custom-alert').style.display = 'none';
+            if(nextAction) nextAction(); else location.reload();
+        };
+    }
 
     document.getElementById('b1').onclick = function() {
+        vibra(150);
         if (new Date().getHours() >= 23 || new Date().getHours() < 5) {
-            alert("NOCHE. RACHA ELIMINADA."); localStorage.clear(); location.reload(); return;
+            playPanic();
+            customAlert("NO SABES NI CUANDO DEBES DORMIR. DUERME O HABRÁ CONSECUENCIAS.", () => {
+                document.getElementById('death-screen').style.display = 'flex';
+                localStorage.clear();
+                sound(50, 'square', 1.5, 0.3);
+            });
+            return;
         }
-        document.getElementById('msg').innerText = pen[document.getElementById('s').value][Math.floor(Math.random()*3)];
+        
+        // Sonido de inicio (Carga de sistema)
+        sound(200, 'sine', 0.1); sound(400, 'sine', 0.15); sound(600, 'sine', 0.2);
+        
         this.style.display='none';
         document.getElementById('b2').style.display='block';
         document.getElementById('timer').style.display='block';
-        let s = 0; st = Date.now();
-        iv = setInterval(() => { 
+        document.getElementById('msg').innerText = "PENITENCIA EN CURSO. NO FALLTES.";
+
+        let s = 0; let st = Date.now();
+        let iv = setInterval(() => { 
             s++; let min = Math.floor(s/60), seg = s%60;
             document.getElementById('timer').innerText = (min<10?'0':'')+min+":"+(seg<10?'0':'')+seg;
+            if(s > 60 && s % 2 === 0) { sound(80, 'triangle', 0.2, 0.15); vibra(50); }
         }, 1000);
-    };
 
-    document.getElementById('b2').onclick = function() {
-        clearInterval(iv);
-        let t = Math.floor((Date.now() - st) / 1000);
-        if (t > 60) {
-            localStorage.setItem('p_m', "LENTO E INEFICIENTE");
-            fallos.unshift({t: t, d: new Date().toLocaleTimeString()});
-            if(fallos.length > 5) fallos.pop();
-            localStorage.setItem('p_fallos', JSON.stringify(fallos));
-            alert(`TARDATE MÁS. ${t}s ES UNA VERGÜENZA.`);
-        } else {
-            localStorage.removeItem('p_m');
-            alert(`CUMPLIDO EN ${t}s. ESTÁS A SALVO.`);
-        }
-        location.reload();
+        document.getElementById('b2').onclick = function() {
+            clearInterval(iv);
+            let t = Math.floor((Date.now() - st) / 1000);
+            if (t > 60) {
+                sound(100, 'sawtooth', 0.5, 0.2);
+                customAlert(`LENTO E INEFICIENTE. ${t}s ES BASURA. RACHA PENALIZADA.`, () => location.reload());
+            } else {
+                sound(1000, 'sine', 0.2);
+                location.reload();
+            }
+        };
     };
 </script>
 </body>

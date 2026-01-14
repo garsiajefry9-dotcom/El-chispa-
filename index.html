@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PREDICADOR OS | V.18 INFINITA</title>
+    <title>PREDICADOR OS | V.19 GOLDEN</title>
     <style>
-        :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
+        :root { --main: #00ff41; --fail: #ff0000; --bg: #000; --gold: #ffd700; }
         body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-transform: uppercase; overflow: hidden; }
         #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; color: #000; font-weight: 900; text-align: center; padding: 20px; flex-direction: column; animation: pulse 0.1s infinite; }
         @keyframes pulse { 0% { background: #f00; } 50% { background: #600; } 100% { background: #f00; } }
-        .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; position: relative; box-shadow: 0 0 30px rgba(0,255,65,0.4); text-align: center; }
+        .frame { width: 90%; max-width: 400px; border: 1px solid var(--main); padding: 20px; background: #050505; position: relative; box-shadow: 0 0 30px rgba(0,255,65,0.4); text-align: center; transition: 0.5s; }
+        .frame.gold { border-color: var(--gold); box-shadow: 0 0 50px var(--gold); }
         .boss-img { width: 100%; height: 180px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 15px; box-shadow: 0 0 15px var(--main); background: #111; }
         #timer { font-size: 3.5rem; color: var(--fail); display: none; margin: 10px 0; font-weight: 900; }
         .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-p { background: var(--main); color: #000; }
         .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
         #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 15px; box-sizing: border-box; margin-top: 10px; text-align: center; font-size: 1.2rem; outline: none; }
-        .status-bar { font-size: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--main); padding-bottom: 5px; margin-bottom: 10px; }
+        .status-bar { font-size: 0.7rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--main); padding-bottom: 5px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -27,8 +28,8 @@
     <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 40px; border:3px solid #fff; margin-top: 20px;">REINTENTAR</button>
 </div>
 
-<div class="frame">
-    <div class="status-bar"><span>PREDICADOR OS</span><span>V.18 300-TASKS</span></div>
+<div class="frame" id="main-frame">
+    <div class="status-bar"><span>RACHA: <b id="streak-val">0</b></span><span>V.19 GOLDEN</span></div>
     <img id="main-img" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400&q=80" class="boss-img">
 
     <select id="mode-select" onchange="actualizarModo()" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:10px;">
@@ -37,19 +38,18 @@
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
 
-    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold; text-align: center; font-size: 0.9rem;">EL PREDICADOR TE VIGILA.</div>
+    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-weight: bold; text-align: center; font-size: 0.9rem;">ESPERANDO ÓRDENES...</div>
     
-    <input type="text" id="answer-input" placeholder="ESCRIBE AQUÍ">
+    <input type="text" id="answer-input" placeholder="RESPUESTA">
     <div id="timer">00:00</div>
     
     <button id="b1" class="btn btn-p">INICIAR PENITENCIA</button>
-    <button id="b2" class="btn btn-l">CUMPLIDO</button>
+    <button id="b2" class="btn btn-l">MARCAR CUMPLIMIENTO</button>
 </div>
 
 <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const vibra = (ms) => { if(navigator.vibrate) navigator.vibrate(ms); }
-    
     const playSound = (f, t, d, v = 0.1) => {
         const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
         o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
@@ -57,105 +57,64 @@
         o.connect(g); g.connect(audioCtx.destination);
         o.start(); o.stop(audioCtx.currentTime + d);
     };
-
-    const hablar = (t) => {
+    const hablar = (t, p=0.1) => {
         const m = new SpeechSynthesisUtterance(t);
-        m.lang = 'es-ES'; m.pitch = 0.1; m.rate = 0.6;
+        m.lang = 'es-ES'; m.pitch = p; m.rate = 0.6;
         window.speechSynthesis.speak(m);
     };
 
-    const imgs = {
-        FISICO: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400&q=80",
-        SANTIDAD: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=400&q=80",
-        MENTAL: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80"
-    };
-
-    // BASE DE DATOS EXPANDIDA (MUESTRA DE CATEGORÍAS)
     const misiones = {
-        FISICO: Array.from({length: 100}, (_, i) => [
-            "50 Burpees", "100 Sentadillas", "3 Min Plancha", "60 Flexiones", "80 Mountain Climbers",
-            "2 Min Sentadilla Pared", "50 Flexiones Diamante", "100 Jumping Jacks", "40 Lunges", "2 Min Sprint",
-            "70 Abdominales", "50 Fondos Tríceps", "4 Min Tábata", "100 Toques Hombro", "50 Sentadillas Salto",
-            "40 Flexiones Arqueras", "30 Caminata Oso", "90 Seg Plancha Lateral", "100 Golpes Boxeo", "50 Puentes Glúteo"
-            // ... (Se repiten lógicas para completar 100 variaciones de intensidad)
-        ].flat()[i % 20] + ` (NIVEL ${i+1})`),
-
-        SANTIDAD: Array.from({length: 100}, (_, i) => [
-            "Ducha Agua Helada", "Détox Digital 1h", "Ayuno Dopamina", "Limpieza de Espacio", "Cero Azúcar Hoy",
-            "15 Min Meditación", "Organizar Archivos", "Borrar 100 Fotos", "Cero Redes Sociales", "Leer 10 Páginas",
-            "Planificar Mañana", "Tender Cama Perfecto", "Limpiar Calzado", "Escribir 3 Metas", "Silencio 20 Min",
-            "Desinstalar App Basura", "Beber 2L Agua", "No Usar Silla 30m", "Cero Cafeína", "Agradecer 3 Cosas"
-        ].flat()[i % 20] + ` (FASE ${i+1})`),
-
-        MENTAL: Array.from({length: 100}, (_, i) => {
-            const pool = [
-                {q:"RAÍZ 169", a:"13"}, {q:"ORO", a:"AU"}, {q:"PLANETA 5", a:"JUPITER"}, {q:"PLATA", a:"AG"},
-                {q:"7 X 8", a:"56"}, {q:"CAPITAL FRANCIA", a:"PARIS"}, {q:"AÑO LUNA", a:"1969"}, {q:"HIERRO", a:"FE"},
-                {q:"9 X 9", a:"81"}, {q:"RAÍZ 225", a:"15"}, {q:"COBRE", a:"CU"}, {q:"CAPITAL JAPÓN", a:"TOKIO"},
-                {q:"12 X 12", a:"144"}, {q:"OXÍGENO", a:"O"}, {q:"MARTE ROJO", a:"MARTE"}, {q:"8 X 4", a:"32"}
-            ];
-            let item = pool[i % pool.length];
-            return {q: `${item.q} (ID:${i+1})`, a: item.a};
-        })
+        FISICO: ["100 Sentadillas", "50 Burpees", "3 Min Plancha", "60 Flexiones", "80 Mountain Climbers"],
+        SANTIDAD: ["Ducha Agua Helada", "Ayuno Dopamina", "Limpieza Espacio", "Cero Redes Sociales"],
+        MENTAL: [{q:"RAÍZ 169", a:"13"}, {q:"ORO", a:"AU"}, {q:"PLANETA 5", a:"JUPITER"}]
     };
 
+    let rachaSesion = 0;
+    
     window.onload = () => {
         const guardado = localStorage.getItem('modo_predicador');
-        if(guardado) {
-            document.getElementById('mode-select').value = guardado;
-            document.getElementById('main-img').src = imgs[guardado];
-        }
+        if(guardado) document.getElementById('mode-select').value = guardado;
     };
-
-    const actualizarModo = () => {
-        const m = document.getElementById('mode-select').value;
-        localStorage.setItem('modo_predicador', m);
-        document.getElementById('main-img').src = imgs[m];
-        playSound(800, 'sine', 0.1);
-    };
-
-    document.getElementById('answer-input').oninput = () => { playSound(600, 'sine', 0.05, 0.05); vibra(20); };
-
-    let qActiva = null, st, iv;
 
     document.getElementById('b1').onclick = function() {
-        playSound(440, 'square', 0.2); vibra(100);
+        playSound(440, 'square', 0.2);
         const m = document.getElementById('mode-select').value;
-        this.style.display = 'none'; 
-        document.getElementById('mode-select').style.display = 'none';
-        document.getElementById('b2').style.display = 'block'; 
-        document.getElementById('timer').style.display = 'block';
-
-        const lista = misiones[m];
-        const randomItem = lista[Math.floor(Math.random() * lista.length)];
+        this.style.display = 'none'; document.getElementById('mode-select').style.display = 'none';
+        document.getElementById('b2').style.display = 'block'; document.getElementById('timer').style.display = 'block';
 
         if(m === 'MENTAL') {
-            qActiva = randomItem;
+            qActiva = misiones.MENTAL[Math.floor(Math.random()*misiones.MENTAL.length)];
             document.getElementById('msg').innerText = qActiva.q;
-            document.getElementById('answer-input').style.display = 'block'; 
-            document.getElementById('answer-input').focus();
-        } else { 
-            document.getElementById('msg').innerText = randomItem; 
-        }
-
-        let s = 0; st = Date.now();
-        iv = setInterval(() => {
-            s++; let min = Math.floor(s/60), seg = s%60;
-            document.getElementById('timer').innerText = (min<10?'0':'')+min+":"+(seg<10?'0':'')+seg;
-            if(s > 60) playSound(100, 'sawtooth', 0.1, 0.1);
-        }, 1000);
+            document.getElementById('answer-input').style.display = 'block'; document.getElementById('answer-input').focus();
+        } else { document.getElementById('msg').innerText = misiones[m][Math.floor(Math.random()*misiones[m].length)]; }
     };
 
     document.getElementById('b2').onclick = function() {
-        clearInterval(iv);
-        if(document.getElementById('mode-select').value === 'MENTAL') {
-            if(document.getElementById('answer-input').value.toUpperCase().trim() === qActiva.a) { location.reload(); }
-            else {
-                playSound(40, 'sawtooth', 2, 0.8); vibra(1000); hablar("ESCORIA");
-                document.getElementById('death-msg').innerText = "CEREBRO INFERIOR";
-                document.getElementById('death-screen').style.display = 'flex';
-            }
-        } else { location.reload(); }
+        const m = document.getElementById('mode-select').value;
+        if(m === 'MENTAL' && document.getElementById('answer-input').value.toUpperCase().trim() !== qActiva.a) {
+            playSound(40, 'sawtooth', 2, 0.8); hablar("ERES DEBIL");
+            document.getElementById('death-screen').style.display = 'flex';
+            return;
+        }
+        
+        rachaSesion++;
+        document.getElementById('streak-val').innerText = rachaSesion;
+        
+        if(rachaSesion === 5) {
+            document.getElementById('main-frame').classList.add('gold');
+            hablar("HAS SIDO RECONOCIDO POR EL OJO", 0.8);
+            alert("MODO DORADO ACTIVADO: ERES UN ELEGIDO.");
+        }
+        
+        // Reset para siguiente tarea sin recargar
+        document.getElementById('b1').style.display = 'block';
+        document.getElementById('mode-select').style.display = 'block';
+        document.getElementById('b2').style.display = 'none';
+        document.getElementById('timer').style.display = 'none';
+        document.getElementById('answer-input').style.display = 'none';
+        document.getElementById('answer-input').value = "";
+        document.getElementById('msg').innerText = "SIGUIENTE NIVEL DISPONIBLE.";
+        playSound(880, 'sine', 0.2);
     };
 </script>
 </body>

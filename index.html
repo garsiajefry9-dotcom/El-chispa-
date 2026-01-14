@@ -1,312 +1,88 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/426/426833.png">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/426/426833.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Chispa Pro</title>
     <style>
-        :root {
-            --bg: #0a0a0c;
-            --card: #16161a;
-            --accent: #00f2ff;
-            --secondary: #ff007a;
-            --text: #ffffff;
-        }
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-
-<script>
-  const btnHecho = document.getElementById('btn-hecho');
-  
-  btnHecho.addEventListener('click', () => {
-    // 1. Lanzar confeti
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#00f2ff', '#ff007a', '#ffffff']
-    });
-
-    // 2. Sonido de éxito (opcional, usando la API de audio)
-    let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
-    audio.play();
-  });
-</script>
-<script>
-    // Lista de misiones rápidas
-    const misiones = [
-        "⚡ ¡Limpia tu escritorio ahora mismo!",
-        "⚡ Haz 10 flexiones o saltos",
-        "⚡ Bebe un vaso de agua completo",
-        "⚡ Organiza esa carpeta de archivos",
-        "⚡ Escribe tus 3 metas de hoy",
-        "⚡ Tira 5 cosas que ya no uses"
-    ];
-
-    const btnRevelar = document.getElementById('btn-revelar');
-    const btnHecho = document.getElementById('btn-hecho');
-    const clickText = document.getElementById('click-text');
-    const revelador = document.getElementById('revelador');
-    const timerDisplay = document.getElementById('timer');
-
-    btnRevelar.addEventListener('click', () => {
-        // 1. Elegir misión al azar
-        const misionAzar = misiones[Math.floor(Math.random() * misiones.length)];
+        :root { --bg: #0a0a0c; --card: #16161a; --accent: #00f2ff; --secondary: #ff007a; --text: #ffffff; }
+        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .app-container { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 40px; text-align: center; border: 1px solid #2d2d35; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .racha-badge { background: rgba(255, 0, 122, 0.1); color: var(--secondary); padding: 5px 15px; border-radius: 20px; font-weight: bold; border: 1px solid var(--secondary); }
         
-        // 2. Mostrar la misión y activar el círculo
-        clickText.style.display = 'none';
-        timerDisplay.style.display = 'block';
-        revelador.classList.add('active');
-        document.getElementById('instruccion').innerText = misionAzar;
-
-        // 3. Cambiar botones
-        btnRevelar.style.display = 'none';
-        btnHecho.style.display = 'block';
-
-        // 4. Iniciar cuenta regresiva (ejemplo rápido)
-        iniciarCronometro(300); // 5 minutos
-    });
-
-    function iniciarCronometro(duracion) {
-        let tiempo = duracion;
-        const intervalo = setInterval(() => {
-            let minutos = Math.floor(tiempo / 60);
-            let segundos = tiempo % 60;
-            timerDisplay.innerText = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-            if (--tiempo < 0) clearInterval(intervalo);
-        }, 1000);
-    }
-</script>
-        
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+        h1 { 
+            font-size: 2.2rem; font-weight: 900; text-transform: uppercase;
+            background: linear-gradient(to right, #00f2ff, #ff007a);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.4)); margin: 0;
         }
 
-        .app-container {
-            width: 90%;
-            max-width: 400px;
-            background: var(--card);
-            padding: 30px;
-            border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            text-align: center;
-            border: 1px solid #2d2d35;
+        .reveal-circle { 
+            width: 200px; height: 200px; border-radius: 50%; margin: 30px auto; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            cursor: pointer; border: 4px dashed #2d2d35; transition: 0.4s; position: relative;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
+        .reveal-circle.active { 
+            border-style: solid !important; border-color: var(--accent) !important;
+            box-shadow: 0 0 20px var(--accent), inset 0 0 20px var(--accent);
+            animation: lightning 1.5s infinite alternate; 
         }
 
-        .racha-badge {
-            background: rgba(255, 0, 122, 0.1);
-            color: var(--secondary);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            border: 1px solid var(--secondary);
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(to right, var(--accent), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
-
-        /* Círculo de Revelación */
-        .reveal-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            margin: 0 auto 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            border: 4px dashed #2d2d35;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-
-        .reveal-circle.active {
-            border-style: solid;
-            border-color: var(--accent);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        #timer {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--accent);
-            display: none;
-        }
-
-        #instruccion {
-            font-size: 1.1rem;
-            padding: 10px;
-            font-weight: 500;
-        }
-
-        .btn-main {
-            background: linear-gradient(135deg, var(--accent), #0072ff);
-            color: #000;
-            border: none;
-            padding: 18px 40px;
-            border-radius: 20px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s;
-        }
-
-        .btn-main:active { transform: scale(0.95); }
-
-        .btn-done {
-            background: var(--secondary);
-            margin-top: 15px;
-            display: none;
-            color: white;
-        }
-
-        /* Animaciones */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .pulse { animation: pulse 2s infinite; }
-        /* --- NUEVOS ESTILOS NEÓN --- */
-h1 {
-    font-size: 2.2rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    background: linear-gradient(to right, #00f2ff, #ff007a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.4));
-    margin: 0;
-}
-
-.reveal-circle.active {
-    border-style: solid !important;
-    border-color: #00f2ff !important;
-    box-shadow: 0 0 20px #00f2ff, inset 0 0 20px #00f2ff;
-    animation: lightning 1.5s infinite alternate;
-}
-
-@keyframes lightning {
-    from { opacity: 1; transform: scale(1.05); }
-    to { opacity: 0.8; transform: scale(1.02); }
-}
+        @keyframes lightning { from { opacity: 1; transform: scale(1.05); } to { opacity: 0.8; transform: scale(1.02); } }
+        #timer { font-size: 2.5rem; font-weight: 800; color: var(--accent); display: none; }
+        .btn-main { background: linear-gradient(135deg, var(--accent), #0072ff); color: black; border: none; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
+        .btn-done { background: var(--secondary); color: white; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-    <div class="header">
-        <h1>El Chispa</h1>
-        <div class="racha-badge">🔥 <span id="racha-count">0</span> DÍAS</div>
+    <div class="app-container">
+        <div class="header">
+            <h1>El Chispa</h1>
+            <div class="racha-badge">🔥 <span id="racha-count">7</span> DÍAS</div>
+        </div>
+        <div id="revelador" class="reveal-circle">
+            <span id="click-text">TOCA PARA<br>REVELAR</span>
+            <div id="timer">05:00</div>
+        </div>
+        <div id="instruccion" style="margin-bottom:20px;">¿Listo para dejar de procrastinar?</div>
+        <button id="btn-revelar" class="btn-main">¡DAME UNA CHISPA!</button>
+        <button id="btn-hecho" class="btn-main btn-done">¡MISIÓN CUMPLIDA!</button>
     </div>
 
-    <div id="revelador" class="reveal-circle pulse" onclick="iniciarMision()">
-        <span id="click-text">TOCA PARA<br>REVELAR</span>
-        <div id="timer">05:00</div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        const misiones = ["⚡ Limpia tu escritorio", "⚡ Haz 10 flexiones", "⚡ Bebe agua", "⚡ Ordena 5 archivos", "⚡ Escribe tus metas"];
+        const btnRevelar = document.getElementById('btn-revelar');
+        const btnHecho = document.getElementById('btn-hecho');
+        const revelador = document.getElementById('revelador');
+        const timerDisplay = document.getElementById('timer');
 
-    <div id="instruccion">¿Listo para dejar de procastinar?</div>
+        btnRevelar.addEventListener('click', () => {
+            const mision = misiones[Math.floor(Math.random() * misiones.length)];
+            document.getElementById('click-text').style.display = 'none';
+            timerDisplay.style.display = 'block';
+            revelador.classList.add('active');
+            document.getElementById('instruccion').innerText = mision;
+            btnRevelar.style.display = 'none';
+            btnHecho.style.display = 'block';
+            iniciarCronometro(300);
+        });
 
-    <button id="btn-revelar" class="btn-main" onclick="iniciarMision()">¡DAME UNA CHISPA!</button>
-    <button id="btn-hecho" class="btn-main btn-done" onclick="completarMision()">¡MISIÓN CUMPLIDA!</button>
-    
-    <p style="color: #4b4b55; font-size: 0.7rem; margin-top: 20px;">LA REGLA: Tienes 5 min para terminar o pierdes la racha.</p>
-</div>
+        btnHecho.addEventListener('click', () => {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00f2ff', '#ff007a'] });
+            new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3').play();
+            setTimeout(() => { alert("¡Misión cumplida!"); location.reload(); }, 1500);
+        });
 
-<script>
-    const misiones = [
-        "Limpia tu escritorio completamente.",
-        "Haz 20 sentadillas explosivas.",
-        "Organiza tu bandeja de entrada de hoy.",
-        "Lee 5 páginas de ese libro pendiente.",
-        "Toma un vaso de agua y estira el cuello.",
-        "Escribe tu prioridad #1 para mañana.",
-        "Limpia la pantalla de tus dispositivos.",
-        "Haz 2 minutos de meditación profunda.",
-        "Bota 3 cosas que no uses de tu cuarto.",
-        "Mándale un mensaje de gratitud a alguien."
-    ];
-
-    let racha = localStorage.getItem('racha') || 0;
-    document.getElementById('racha-count').innerText = racha;
-
-    let tiempoRestante = 300; // 5 minutos
-    let interval;
-
-    function iniciarMision() {
-        // UI Changes
-        document.getElementById('click-text').style.display = 'none';
-        document.getElementById('btn-revelar').style.display = 'none';
-        document.getElementById('timer').style.display = 'block';
-        document.getElementById('btn-hecho').style.display = 'block';
-        document.getElementById('revelador').classList.remove('pulse');
-        document.getElementById('revelador').classList.add('active');
-
-        // Elegir misión
-        const randomMision = misiones[Math.floor(Math.random() * misiones.length)];
-        document.getElementById('instruccion').innerText = randomMision;
-
-        // Iniciar Cronómetro
-        iniciarTimer();
-        
-        // Vibración (solo en móviles)
-        if (navigator.vibrate) navigator.vibrate(50);
-    }
-
-    function iniciarTimer() {
-        clearInterval(interval);
-        interval = setInterval(() => {
-            let minutos = Math.floor(tiempoRestante / 60);
-            let segundos = tiempoRestante % 60;
-            document.getElementById('timer').innerText = 
-                `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-            
-            if (tiempoRestante <= 0) {
-                clearInterval(interval);
-                alert("¡Se acabó el tiempo! No rompas tu racha la próxima vez.");
-                location.reload();
-            }
-            tiempoRestante--;
-        }, 1000);
-    }
-
-    function completarMision() {
-        clearInterval(interval);
-        racha++;
-        localStorage.setItem('racha', racha);
-        document.getElementById('racha-count').innerText = racha;
-        
-        alert("¡Felicidades! Un paso más lejos de la pereza.");
-        location.reload(); // Reiniciar para la siguiente
-    }
-</script>
-
+        function iniciarCronometro(t) {
+            const int = setInterval(() => {
+                let m = Math.floor(t / 60), s = t % 60;
+                timerDisplay.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                if (--t < 0) { clearInterval(int); location.reload(); }
+            }, 1000);
+        }
+    </script>
 </body>
 </html>

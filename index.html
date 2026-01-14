@@ -14,7 +14,71 @@
             --secondary: #ff007a;
             --text: #ffffff;
         }
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
+<script>
+  const btnHecho = document.getElementById('btn-hecho');
+  
+  btnHecho.addEventListener('click', () => {
+    // 1. Lanzar confeti
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#00f2ff', '#ff007a', '#ffffff']
+    });
+
+    // 2. Sonido de éxito (opcional, usando la API de audio)
+    let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+    audio.play();
+  });
+</script>
+<script>
+    // Lista de misiones rápidas
+    const misiones = [
+        "⚡ ¡Limpia tu escritorio ahora mismo!",
+        "⚡ Haz 10 flexiones o saltos",
+        "⚡ Bebe un vaso de agua completo",
+        "⚡ Organiza esa carpeta de archivos",
+        "⚡ Escribe tus 3 metas de hoy",
+        "⚡ Tira 5 cosas que ya no uses"
+    ];
+
+    const btnRevelar = document.getElementById('btn-revelar');
+    const btnHecho = document.getElementById('btn-hecho');
+    const clickText = document.getElementById('click-text');
+    const revelador = document.getElementById('revelador');
+    const timerDisplay = document.getElementById('timer');
+
+    btnRevelar.addEventListener('click', () => {
+        // 1. Elegir misión al azar
+        const misionAzar = misiones[Math.floor(Math.random() * misiones.length)];
+        
+        // 2. Mostrar la misión y activar el círculo
+        clickText.style.display = 'none';
+        timerDisplay.style.display = 'block';
+        revelador.classList.add('active');
+        document.getElementById('instruccion').innerText = misionAzar;
+
+        // 3. Cambiar botones
+        btnRevelar.style.display = 'none';
+        btnHecho.style.display = 'block';
+
+        // 4. Iniciar cuenta regresiva (ejemplo rápido)
+        iniciarCronometro(300); // 5 minutos
+    });
+
+    function iniciarCronometro(duracion) {
+        let tiempo = duracion;
+        const intervalo = setInterval(() => {
+            let minutos = Math.floor(tiempo / 60);
+            let segundos = tiempo % 60;
+            timerDisplay.innerText = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+            if (--tiempo < 0) clearInterval(intervalo);
+        }, 1000);
+    }
+</script>
+        
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background-color: var(--bg);
@@ -130,6 +194,29 @@
         }
 
         .pulse { animation: pulse 2s infinite; }
+        /* --- NUEVOS ESTILOS NEÓN --- */
+h1 {
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: linear-gradient(to right, #00f2ff, #ff007a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.4));
+    margin: 0;
+}
+
+.reveal-circle.active {
+    border-style: solid !important;
+    border-color: #00f2ff !important;
+    box-shadow: 0 0 20px #00f2ff, inset 0 0 20px #00f2ff;
+    animation: lightning 1.5s infinite alternate;
+}
+
+@keyframes lightning {
+    from { opacity: 1; transform: scale(1.05); }
+    to { opacity: 0.8; transform: scale(1.02); }
+}
     </style>
 </head>
 <body>

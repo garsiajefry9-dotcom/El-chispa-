@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PREDICADOR OS | V.27 INFINITE</title>
+    <title>PREDICADOR OS | ATMOSPHERE</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; --gold: #ffd700; }
         body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 15px; text-transform: uppercase; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; transition: 0.8s; }
         .gold-mode { --main: var(--gold); background: #1a1500 !important; }
         .night-mode { filter: contrast(1.3) brightness(0.7); background: #000500; }
-        .frame { width: 100%; max-width: 380px; border: 2px solid var(--main); padding: 15px; background: #050505; box-shadow: 0 0 20px rgba(0,255,65,0.2); position: relative; transition: 0.5s; }
+        .frame { width: 100%; max-width: 380px; border: 2px solid var(--main); padding: 15px; background: #050505; box-shadow: 0 0 20px rgba(0,255,65,0.2); position: relative; z-index: 10; transition: 0.5s; }
         .frame.gold-border { border-color: var(--gold); box-shadow: 0 0 50px var(--gold); }
         .boss-img { width: 100%; height: 150px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 10px; }
         #timer { font-size: 3.5rem; color: var(--fail); margin: 10px 0; font-weight: 900; display: none; text-shadow: 0 0 10px #f00; }
@@ -25,7 +25,7 @@
 <body>
 
 <div id="death-screen">
-    <h1 id="d-title" style="font-size: 3rem; margin:0;">ERROR</h1>
+    <h1 style="font-size: 3rem; margin:0;">ERROR</h1>
     <p id="d-msg" style="font-weight: 900; padding: 20px;"></p>
     <button class="btn" style="background:#000; color:#fff; width: 80%; border: 3px solid #fff;" onclick="location.reload()">REINTENTAR</button>
 </div>
@@ -42,33 +42,43 @@
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
     <div id="msg" style="min-height: 80px; margin: 10px 0; border: 1px dashed #333; display: flex; align-items: center; justify-content: center; padding: 10px; font-size: 0.85rem;">EL PREDICADOR TE ESPERA.</div>
-    <input type="text" id="answer-input" placeholder="ESCRIBE">
+    <input type="text" id="answer-input" placeholder="RESPUESTA">
     <div id="timer">00:00</div>
     <button id="b-start" class="btn btn-p" onclick="startTask()">INICIAR JUICIO</button>
     <button id="b-done" class="btn btn-l" onclick="endTask()">CUMPLIDO</button>
 </div>
 
 <script>
-    let racha = 0; let tInicio = 0; let intv; let qA = null;
+    let racha = 0; let tInicio = 0; let intv; let qA = null; let musicStarted = false;
     const aCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    const db = {
-        FISICO: ["100 Flexiones", "50 Burpees", "3 Min Plancha", "80 Sentadillas", "60 Fondos Tríceps", "100 Mountain Climbers", "4 Min Wall Sit", "50 Zancadas Expl.", "70 Abdominales", "30 Dominadas/Remo", "150 Saltos Cuerda", "5 Min Estiramiento Activo", "40 Salto al Cajón", "60 Flexiones Diamante", "100 Puñetazos Sombra"],
-        SANTIDAD: ["Ducha Agua Helada", "1 Hora Sin Móvil", "Limpiar Habitación Ya", "Ayuno Dopamina", "Cero Azúcar Hoy", "Meditar 10 Minutos", "Leer 20 Páginas", "Planificar Mañana", "Cero Redes Sociales", "Escribir Diario Éxitos", "Beber 1L Agua Ya", "Cero Quejas Hoy", "Levantarse Sin Posponer", "Ayuno Intermitente 16h"],
-        MENTAL: [
-            {q:"7 X 8 X 2", a:"112"}, {q:"RAÍZ 225", a:"15"}, {q:"ORO (SIMBOLO)", a:"AU"},
-            {q:"CONTINENTE 4 (ALFAB)", a:"EUROPA"}, {q:"15% DE 200", a:"30"}, {q:"PLANETA 6", a:"SATURNO"},
-            {q:"CANTIDAD HUESOS", a:"206"}, {q:"SIMBOLO PLATA", a:"AG"}, {q:"RAIZ 625", a:"25"},
-            {q:"12 X 12", a:"144"}, {q:"AÑO DESC. AMERICA", a:"1492"}, {q:"GAS VITAL (SIMB)", a:"O"}
-        ]
+    const playSound = (f, d, t='sine', v=0.03) => {
+        const o = aCtx.createOscillator(); const g = aCtx.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, aCtx.currentTime);
+        g.gain.setValueAtTime(v, aCtx.currentTime);
+        o.connect(g); g.connect(aCtx.destination);
+        o.start(); o.stop(aCtx.currentTime + d);
     };
 
-    const clickSound = () => {
-        const o = aCtx.createOscillator(); const g = aCtx.createGain();
-        o.type = 'sine'; o.frequency.setValueAtTime(900, aCtx.currentTime);
-        g.gain.setValueAtTime(0.03, aCtx.currentTime);
-        o.connect(g); g.connect(aCtx.destination);
-        o.start(); o.stop(aCtx.currentTime + 0.02);
+    const clickSound = () => playSound(900, 0.02);
+
+    // MÚSICA DE FONDO (Dark Drone)
+    const startBackgroundMusic = () => {
+        if(musicStarted) return;
+        musicStarted = true;
+        const o1 = aCtx.createOscillator(); const o2 = aCtx.createOscillator();
+        const g = aCtx.createGain();
+        o1.type = 'sawtooth'; o1.frequency.setValueAtTime(40, aCtx.currentTime);
+        o2.type = 'sine'; o2.frequency.setValueAtTime(42, aCtx.currentTime);
+        g.gain.setValueAtTime(0.015, aCtx.currentTime); // Volumen bajo
+        o1.connect(g); o2.connect(g); g.connect(aCtx.destination);
+        o1.start(); o2.start();
+    };
+
+    const db = {
+        FISICO: ["100 Flexiones", "50 Burpees", "3 Min Plancha", "80 Sentadillas", "100 Mountain Climbers", "4 Min Wall Sit"],
+        SANTIDAD: ["Ducha Agua Helada", "1 Hora Sin Móvil", "Limpiar Habitación Ya", "Ayuno Dopamina", "Cero Azúcar Hoy"],
+        MENTAL: [{q:"7 X 8 X 2", a:"112"}, {q:"RAÍZ 225", a:"15"}, {q:"SIMBOLO ORO", a:"AU"}]
     };
 
     window.onload = () => {
@@ -80,6 +90,7 @@
     };
 
     function startTask() {
+        startBackgroundMusic();
         clickSound(); tInicio = Date.now();
         const m = document.getElementById('mode').value;
         document.getElementById('b-start').style.display = 'none';
@@ -108,26 +119,21 @@
         const sTotal = (Date.now() - tInicio)/1000;
         const mode = document.getElementById('mode').value;
 
-        if(mode !== 'MENTAL' && sTotal < 10) { muerte("MENTIROSO", "INTENTASTE ENGAÑAR AL OJO."); return; }
-        if(mode === 'MENTAL' && document.getElementById('answer-input').value.trim().toUpperCase() !== qA.a) { muerte("FALLO MENTAL", "CEREBRO DEFECTUOSO."); return; }
-
+        if(mode !== 'MENTAL' && sTotal < 10) { muerte("MENTIROSO", "DEMASIADO RÁPIDO."); return; }
+        
         racha++; document.getElementById('streak-val').innerText = racha;
         if(racha >= 5) {
             document.body.classList.add('gold-mode');
             document.getElementById('main-frame').classList.add('gold-border');
-            const u = new SpeechSynthesisUtterance("ERES UN ELEGIDO.");
-            u.pitch = 0.8; window.speechSynthesis.speak(u);
         }
         resetUI();
     }
 
     function muerte(t, msg) {
-        document.getElementById('d-title').innerText = t;
         document.getElementById('d-msg').innerText = msg;
         document.getElementById('death-screen').style.display = 'flex';
+        playSound(60, 2, 'sawtooth', 0.5);
         if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
-        const u = new SpeechSynthesisUtterance(t + ". " + msg);
-        u.lang = 'es-ES'; u.pitch = 0.1; u.rate = 0.6; window.speechSynthesis.speak(u);
     }
 
     function resetUI() {
@@ -136,8 +142,7 @@
         document.getElementById('b-done').style.display = 'none';
         document.getElementById('timer').style.display = 'none';
         document.getElementById('answer-input').style.display = 'none';
-        document.getElementById('answer-input').value = "";
-        document.getElementById('msg').innerText = "REGISTRADO. SIGUIENTE RETO.";
+        document.getElementById('msg').innerText = "TAREA REGISTRADA.";
     }
 
     document.getElementById('answer-input').onkeydown = clickSound;

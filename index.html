@@ -34,6 +34,28 @@
         #timer { font-size: 2.5rem; font-weight: 800; color: var(--accent); display: none; }
         .btn-main { background: linear-gradient(135deg, var(--accent), #0072ff); color: black; border: none; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
         .btn-done { background: var(--secondary); color: white; margin-top: 15px; display: none; }
+        /* Menú de navegación inferior */
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    background: #1c1c22;
+    padding: 15px;
+    border-radius: 25px;
+    margin-top: 25px;
+    border: 1px solid #2d2d35;
+}
+
+.nav-item {
+    color: #4b4b55;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.nav-item.active {
+    color: var(--accent);
+    filter: drop-shadow(0 0 5px var(--accent));
+}
     </style>
 </head>
 <body>
@@ -53,6 +75,38 @@
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
+        // 1. Guardar y Cargar Racha Automáticamente
+let rachaGuardada = localStorage.getItem('chispa_racha') || 0;
+document.getElementById('racha-count').innerText = rachaGuardada;
+
+// Actualizar racha al ganar
+btnHecho.addEventListener('click', () => {
+    rachaGuardada = parseInt(rachaGuardada) + 1;
+    localStorage.setItem('chispa_racha', rachaGuardada);
+    document.getElementById('racha-count').innerText = rachaGuardada;
+    
+    // El confeti y sonido que ya tienes...
+});
+
+// 2. Lógica del Menú
+const navItems = document.querySelectorAll('.nav-item');
+navItems.forEach((item, index) => {
+    item.addEventListener('click', () => {
+        // Quitar activo de todos y ponerlo al que tocamos
+        navItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        // Acciones del menú
+        if(index === 1) { // Icono de Estadísticas 📊
+            alert("Llevas " + rachaGuardada + " misiones completadas con éxito. ¡No te detengas!");
+        }
+        if(index === 2) { // Icono de Ajustes ⚙️
+            let nombre = prompt("¿Cómo quieres que te llame El Chispa?");
+            if(nombre) alert("¡Entendido, " + nombre + "!");
+        }
+    });
+});
+
         const misiones = ["⚡ Limpia tu escritorio", "⚡ Haz 10 flexiones", "⚡ Bebe agua", "⚡ Ordena 5 archivos", "⚡ Escribe tus metas"];
         const btnRevelar = document.getElementById('btn-revelar');
         const btnHecho = document.getElementById('btn-hecho');

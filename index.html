@@ -104,3 +104,173 @@
         .reveal-circle img {
             width: 100%;
             height: 100%;
+            object-fit: cover;
+            position: absolute;
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        .reveal-circle.active {
+            border-style: solid;
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent);
+            transform: scale(1.05);
+        }
+
+        .reveal-circle.active img { opacity: 0.4; }
+
+        #timer { font-size: 2.2rem; font-weight: 800; color: var(--accent); display: none; z-index: 2; }
+        #click-text { font-size: 0.9rem; font-weight: bold; color: var(--gray); z-index: 2; }
+
+        /* Botones */
+        .btn-main {
+            background: linear-gradient(135deg, var(--accent), #0072ff);
+            color: black;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 800;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-done { background: var(--secondary); color: white; display: none; margin-top: 10px; }
+        .btn-main:active { transform: scale(0.95); }
+
+        /* Menú Inferior */
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background: #1c1c22;
+            padding: 12px;
+            border-radius: 25px;
+            margin-top: 25px;
+            border: 1px solid #2d2d35;
+        }
+
+        .nav-item { color: var(--gray); font-size: 1.3rem; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); filter: drop-shadow(0 0 5px var(--accent)); }
+
+        #instruccion { min-height: 40px; margin-bottom: 10px; font-weight: 500; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>El Chispa</h1>
+        <div class="racha-badge">🔥 <span id="racha-count">0</span> DÍAS</div>
+    </div>
+
+    <div class="category-select" id="cat-box">
+        <label>¿QUÉ TIPO DE MISIÓN BUSCAS?</label>
+        <select id="categoria-selector">
+            <option value="domesticas">🧹 Domésticas (Limpieza)</option>
+            <option value="ejercicio">💪 Ejercicio (Cuerpo)</option>
+            <option value="trabajo">📚 Trabajo / Estudio</option>
+        </select>
+    </div>
+
+    <div id="revelador" class="reveal-circle">
+        <img id="bg-image" src="" alt="fondo">
+        <span id="click-text">ELIGE Y TOCA<br>ABAJO</span>
+        <div id="timer">05:00</div>
+    </div>
+
+    <div id="instruccion">¿Listo para la acción?</div>
+
+    <button id="btn-revelar" class="btn-main">¡DAME UNA CHISPA!</button>
+    <button id="btn-hecho" class="btn-main btn-done">¡MISIÓN CUMPLIDA!</button>
+
+    <div class="navbar">
+        <div class="nav-item active" onclick="location.reload()">⚡</div>
+        <div class="nav-item" onclick="verStats()">📊</div>
+        <div class="nav-item" onclick="configurar()">⚙️</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+    const misionesDB = {
+        domesticas: {
+            tasks: ["Limpia tu escritorio", "Lava los platos", "Saca la basura", "Ordena tus zapatos", "Limpia el espejo"],
+            img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=400"
+        },
+        ejercicio: {
+            tasks: ["20 Sentadillas", "1 minuto de plancha", "15 Flexiones", "30 Jumping Jacks", "Estiramiento completo"],
+            img: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400"
+        },
+        trabajo: {
+            tasks: ["Revisa tus emails", "Planifica tu mañana", "Lee 5 páginas", "Escribe 10 minutos", "Organiza archivos"],
+            img: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=400"
+        }
+    };
+
+    const btnRevelar = document.getElementById('btn-revelar');
+    const btnHecho = document.getElementById('btn-hecho');
+    const timerDisplay = document.getElementById('timer');
+    const revelador = document.getElementById('revelador');
+    const rachaDisplay = document.getElementById('racha-count');
+
+    // Cargar Racha del Almacenamiento Local
+    let racha = localStorage.getItem('chispa_racha_pro') || 0;
+    rachaDisplay.innerText = racha;
+
+    btnRevelar.addEventListener('click', () => {
+        const cat = document.getElementById('categoria-selector').value;
+        const seleccion = misionesDB[cat];
+        const misionFinal = seleccion.tasks[Math.floor(Math.random() * seleccion.tasks.length)];
+
+        // Cambios Visuales
+        document.getElementById('cat-box').style.display = 'none';
+        document.getElementById('click-text').style.display = 'none';
+        document.getElementById('bg-image').src = seleccion.img;
+        timerDisplay.style.display = 'block';
+        revelador.classList.add('active');
+        document.getElementById('instruccion').innerText = "MISIÓN: " + misionFinal;
+        
+        btnRevelar.style.display = 'none';
+        btnHecho.style.display = 'block';
+
+        iniciarTimer(300); // 5 minutos
+    });
+
+    btnHecho.addEventListener('click', () => {
+        // Confeti
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00f2ff', '#ff007a'] });
+        
+        // Sonido
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3').play();
+
+        // Actualizar racha
+        racha = parseInt(racha) + 1;
+        localStorage.setItem('chispa_racha_pro', racha);
+        rachaDisplay.innerText = racha;
+
+        setTimeout(() => { alert("¡Felicidades! Racha aumentada."); location.reload(); }, 2000);
+    });
+
+    function iniciarTimer(segundos) {
+        let t = segundos;
+        const x = setInterval(() => {
+            let m = Math.floor(t / 60), s = t % 60;
+            timerDisplay.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+            if (--t < 0) {
+                clearInterval(x);
+                alert("¡Se acabó el tiempo! Perdiste la racha.");
+                location.reload();
+            }
+        }, 1000);
+    }
+
+    function verStats() { alert("Has completado un total de " + racha + " chispazos. ¡Eres una máquina!"); }
+    function configurar() { 
+        let user = prompt("¿Cómo quieres llamarte?");
+        if(user) alert("Configuración guardada para " + user);
+    }
+</script>
+
+</body>
+</html>

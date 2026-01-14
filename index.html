@@ -23,13 +23,13 @@
 <body>
 
 <div id="death-screen">
-    <h1 style="font-size: 2.2rem; margin-bottom: 10px;">FRACASO TOTAL</h1>
-    <p id="death-msg">(RACHA ELIMINADA)</p>
+    <h1 style="font-size: 2.2rem; margin-bottom: 10px;">FRACASO ABSOLUTO</h1>
+    <p id="death-msg"></p>
     <button onclick="location.reload()" class="btn" style="background:#000; color:#fff; width:auto; padding:15px 40px; border:3px solid #fff; margin-top: 20px;">REINTENTAR</button>
 </div>
 
 <div class="frame">
-    <div class="status-bar"><span>PREDICADOR OS</span><span>V.12 VOICE-ON</span></div>
+    <div class="status-bar"><span>PREDICADOR OS</span><span>V.13 SOMBRÍO</span></div>
     <img id="main-img" src="https://files.oaiusercontent.com/file-78U7vXm9z3V5C2fD6T1K4L?se=2024-05-23T15%3A20%3A22Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3Dpredicador_ojo.webp" class="boss-img">
 
     <select id="mode-select">
@@ -38,7 +38,7 @@
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
 
-    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-size: 1.1rem; font-weight: bold;">ESCUCHA MI VOZ. OBEDECE.</div>
+    <div id="msg" style="height: 110px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 1px dashed var(--main); padding:10px; font-size: 1.1rem; font-weight: bold;">SELECCIONA TU JUICIO.</div>
     <input type="text" id="answer-input" placeholder="RESPUESTA AQUÍ">
     <div id="timer">00:00</div>
     <button id="b1" class="btn btn-p">ASUMIR PENITENCIA</button>
@@ -49,12 +49,13 @@
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const vibra = (ms) => { if(navigator.vibrate) navigator.vibrate(ms); }
     
-    // Función para que el Predicador hable
+    // Función de voz ultra tenebrosa
     const hablar = (texto) => {
         const msg = new SpeechSynthesisUtterance(texto);
         msg.lang = 'es-ES';
-        msg.pitch = 0.5; // Voz más grave y tenebrosa
-        msg.rate = 0.8;  // Un poco más lento para intimidar
+        msg.pitch = 0.1; // Lo más grave posible
+        msg.rate = 0.7;  // Más lento para mayor impacto
+        msg.volume = 1;
         window.speechSynthesis.speak(msg);
     };
 
@@ -77,7 +78,7 @@
 
     const misiones = {
         FISICO: ["HAZ 40 BURPEES", "100 SENTADILLAS", "3 MIN PLANCHA", "50 FLEXIONES"],
-        SANTIDAD: ["DUCHA DE AGUA HELADA", "DÉTOX DIGITAL", "MEDITACIÓN RÍGIDA", "AYUNO TOTAL"],
+        SANTIDAD: ["DUCHA DE AGUA HELADA", "DÉTOX DIGITAL TOTAL", "MEDITACIÓN RÍGIDA", "AYUNO TOTAL"],
         MENTAL: [{q:"RAÍZ DE 169", a:"13"}, {q:"ORO EN QUÍMICA", a:"AU"}, {q:"PLANETA 5", a:"JUPITER"}]
     };
 
@@ -86,7 +87,7 @@
 
     document.getElementById('b1').onclick = function() {
         if (new Date().getHours() >= 23 || new Date().getHours() < 5) {
-            const txt = "EL PREDICADOR NO DUERME. TÚ DEBERÍAS. RACHA ELIMINADA.";
+            const txt = "EL PREDICADOR NO DUERME. DUERME O SUFRE.";
             hablar(txt);
             document.getElementById('death-msg').innerText = txt;
             document.getElementById('death-screen').style.display = 'flex';
@@ -114,7 +115,7 @@
             s++;
             let min = Math.floor(s/60), seg = s%60;
             document.getElementById('timer').innerText = (min<10?'0':'')+min+":"+(seg<10?'0':'')+seg;
-            if(s > 60) { sound(150, 'sawtooth', 0.1, 0.2); vibra(50); }
+            if(s > 60) { sound(100, 'sawtooth', 0.1, 0.2); vibra(50); }
         }, 1000);
     };
 
@@ -126,17 +127,17 @@
 
         if(m === 'MENTAL') {
             if(document.getElementById('answer-input').value.toUpperCase().trim() === qActiva.a) {
-                alert("SUERTE DE PRINCIPIANTE."); location.reload();
+                alert("SIGUES SIENDO ÚTIL."); location.reload();
             } else {
-                sound(50, 'sawtooth', 1.5, 0.6); vibra(1000);
-                hablar(insulto); // El Predicador te insulta con voz
+                sound(40, 'sawtooth', 2, 0.6); vibra(1000);
+                hablar(insulto);
                 document.getElementById('death-msg').innerText = insulto;
                 document.getElementById('death-screen').style.display = 'flex';
                 localStorage.clear();
             }
         } else {
             if(t > 60) {
-                hablar("ERES DEMASIADO LENTO");
+                hablar("MUY LENTO");
                 alert("FRACASO POR LENTITUD."); location.reload();
             } else { location.reload(); }
         }

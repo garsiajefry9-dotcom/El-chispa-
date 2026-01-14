@@ -2,88 +2,92 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PREDICADOR OS | ESTABLE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PREDICADOR OS | SUPREMO</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; }
-        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 20px; text-transform: uppercase; }
+        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 15px; text-transform: uppercase; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; }
         
-        .frame { max-width: 400px; margin: auto; border: 1px solid var(--main); padding: 15px; background: #050505; box-shadow: 0 0 15px var(--main); }
-        .boss-img { width: 100%; height: 150px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 10px; }
+        .frame { width: 100%; max-width: 380px; border: 2px solid var(--main); padding: 15px; background: #050505; box-shadow: 0 0 20px rgba(0,255,65,0.3); position: relative; z-index: 10; }
+        .boss-img { width: 100%; height: 160px; object-fit: cover; border: 1px solid var(--main); margin-bottom: 10px; box-shadow: 0 0 10px var(--main); }
         
-        #timer { font-size: 3rem; color: var(--fail); margin: 10px 0; font-weight: 900; display: none; }
-        .status { font-size: 0.7rem; display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--main); }
+        #timer { font-size: 3.5rem; color: var(--fail); margin: 10px 0; font-weight: 900; display: none; text-shadow: 0 0 10px #f00; }
+        .status { font-size: 0.7rem; display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--main); padding-bottom: 5px; }
         
-        .btn { width: 100%; padding: 15px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; margin-top: 10px; }
-        .btn-p { background: var(--main); color: #000; }
-        .btn-l { background: #000; color: var(--main); border: 1px solid var(--main); display: none; }
+        .btn { width: 100%; padding: 18px; border: none; font-family: inherit; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn-p { background: var(--main); color: #000; box-shadow: 0 4px 0 #008f11; }
+        .btn-l { background: #000; color: var(--main); border: 2px solid var(--main); display: none; }
         
-        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 10px; margin-top: 10px; box-sizing: border-box; text-align: center; }
+        #answer-input { display: none; width: 100%; background: #000; color: var(--main); border: 1px solid var(--main); padding: 12px; margin-top: 10px; box-sizing: border-box; text-align: center; font-size: 1.2rem; }
         
-        /* Pantallas Flotantes */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 100; overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        #death-screen { background: var(--fail); color: #000; z-index: 200; }
+        /* Pantalla de Muerte Agresiva */
+        #death-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fail); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; animation: shake 0.1s infinite, flash 0.2s infinite; color: #000; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
+
+        /* Historial */
+        #h-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; padding: 20px; box-sizing: border-box; overflow-y: auto; color: var(--main); border: 4px solid var(--main); }
     </style>
 </head>
 <body>
 
-<div id="h-screen" class="overlay">
-    <h2>REGISTRO DE FALLAS</h2>
-    <div id="h-list" style="text-align:left; font-size:0.8rem;"></div>
-    <button class="btn btn-p" onclick="document.getElementById('h-screen').style.display='none'">CERRAR</button>
+<div id="h-screen">
+    <h2 style="border-bottom: 2px solid var(--main)">ARCHIVO DE DESHONRA</h2>
+    <div id="h-list" style="text-align:left; font-size:0.9rem;"></div>
+    <button class="btn btn-p" onclick="document.getElementById('h-screen').style.display='none'">VOLVER</button>
 </div>
 
-<div id="death-screen" class="overlay">
-    <h1 id="d-title">FRACASO</h1>
-    <p id="d-msg"></p>
-    <button class="btn" style="background:#000; color:#fff;" onclick="location.reload()">REINTENTAR</button>
+<div id="death-screen">
+    <h1 id="d-title" style="font-size: 4rem; margin: 0;">FALLASTE</h1>
+    <p id="d-msg" style="font-weight: 900; font-size: 1.2rem;"></p>
+    <button class="btn" style="background:#000; color:#fff; width: 80%; border: 4px solid #fff;" onclick="location.reload()">REINTENTAR</button>
 </div>
 
 <div class="frame">
     <div class="status">
         <span>RACHA: <b id="streak-val">0</b></span>
-        <span onclick="openH()" style="cursor:pointer; text-decoration: underline;">VER HISTORIAL</span>
+        <span onclick="openH()" style="text-decoration: underline; color: var(--main); cursor: pointer;">HISTORIAL</span>
     </div>
     
     <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400" class="boss-img">
 
-    <select id="mode" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:5px;">
+    <select id="mode" style="width:100%; background:#000; color:var(--main); border:1px solid var(--main); padding:10px; font-weight: bold;">
         <option value="FISICO">ENTRENAMIENTO ESPARTANO</option>
         <option value="SANTIDAD">SANTIDAD DE HIERRO</option>
         <option value="MENTAL">INTERROGATORIO MENTAL</option>
     </select>
 
-    <div id="msg" style="min-height: 60px; margin: 10px 0; border: 1px dashed #333; display: flex; align-items: center; justify-content: center; padding: 5px;">EL OJO TE OBSERVA.</div>
+    <div id="msg" style="min-height: 70px; margin: 10px 0; border: 1px dashed #333; display: flex; align-items: center; justify-content: center; padding: 10px; font-size: 0.9rem;">EL PREDICADOR ESPERA...</div>
     
-    <input type="text" id="answer-input" placeholder="RESPUESTA">
+    <input type="text" id="answer-input" placeholder="ESCRIBE">
     <div id="timer">00:00</div>
     
-    <button id="b-start" class="btn btn-p" onclick="startTask()">INICIAR</button>
+    <button id="b-start" class="btn btn-p" onclick="startTask()">INICIAR JUICIO</button>
     <button id="b-done" class="btn btn-l" onclick="endTask()">CUMPLIDO</button>
 </div>
 
 <script>
-    let racha = 0;
-    let tInicio = 0;
-    let intv;
-    let qA = null;
+    let racha = 0; let tInicio = 0; let intv; let qA = null;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const playBeep = (f, d) => {
+        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        o.type = 'sawtooth'; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + d);
+    };
 
     const misiones = {
-        FISICO: ["50 Flexiones", "100 Sentadillas", "3 Min Plancha", "40 Burpees"],
-        SANTIDAD: ["Ducha Fría", "Sin móvil 1h", "Cero Azúcar", "Meditar 10m"],
-        MENTAL: [{q:"7 X 9", a:"63"}, {q:"RAIZ 144", a:"12"}, {q:"ORO (SIMBOLO)", a:"AU"}]
+        FISICO: ["50 Burpees", "100 Sentadillas", "3 Min Plancha", "60 Flexiones"],
+        SANTIDAD: ["Ducha Fría", "Sin Redes 1h", "Ayuno Dopamina", "Cero Azúcar"],
+        MENTAL: [{q:"7 X 8", a:"56"}, {q:"RAIZ 169", a:"13"}, {q:"PLATA (SIMBOLO)", a:"AG"}]
     };
 
     function openH() {
-        const h = JSON.parse(localStorage.getItem('p_fallas') || "[]");
-        document.getElementById('h-list').innerHTML = h.map(f => `<p style="border-bottom:1px solid #222; padding:5px;">✖ ${f.t} | ${f.m} <br><small>${f.d}</small></p>`).join('');
+        const h = JSON.parse(localStorage.getItem('p_f') || "[]");
+        document.getElementById('h-list').innerHTML = h.map(f => `<p style="border-bottom:1px solid #222; padding:10px; color:red;">✖ [${f.t}] - ${f.m} <br><small>${f.d}</small></p>`).join('');
         document.getElementById('h-screen').style.display = 'block';
-    }
-
-    function saveF(m, t) {
-        let h = JSON.parse(localStorage.getItem('p_fallas') || "[]");
-        h.unshift({m, t, d: new Date().toLocaleTimeString()});
-        localStorage.setItem('p_fallas', JSON.stringify(h.slice(0, 20)));
     }
 
     function startTask() {
@@ -98,6 +102,7 @@
             qA = misiones.MENTAL[Math.floor(Math.random()*misiones.MENTAL.length)];
             document.getElementById('msg').innerText = qA.q;
             document.getElementById('answer-input').style.display = 'block';
+            document.getElementById('answer-input').focus();
         } else {
             document.getElementById('msg').innerText = misiones[m][Math.floor(Math.random()*misiones[m].length)];
         }
@@ -115,45 +120,38 @@
         const sTotal = (Date.now() - tInicio)/1000;
         const tStr = document.getElementById('timer').innerText;
 
-        // Validar Trampa
         if(m !== 'MENTAL' && sTotal < 10) {
-            muerte("TRAMPOSO", "LA TRAMPA ES DEBILIDAD", tStr);
-            return;
+            muerte("MENTIROSO", "LA TRAMPA ES DEBILIDAD", tStr); return;
+        }
+        if(m === 'MENTAL' && document.getElementById('answer-input').value.trim().toUpperCase() !== qA.a) {
+            muerte("ERROR", "CEREBRO INFERIOR", tStr); return;
         }
 
-        // Validar Mental
-        if(m === 'MENTAL') {
-            if(document.getElementById('answer-input').value.trim().toUpperCase() !== qA.a) {
-                muerte("ERROR", "CEREBRO INFERIOR", tStr);
-                return;
-            }
-        }
-
-        racha++;
-        document.getElementById('streak-val').innerText = racha;
-        reset();
-    }
-
-    function muerte(t, msg, time) {
-        saveF(t, time);
-        document.getElementById('d-title').innerText = t;
-        document.getElementById('d-msg').innerText = msg;
-        document.getElementById('death-screen').style.display = 'block';
-        if(window.speechSynthesis) {
-            let u = new SpeechSynthesisUtterance(t + ". " + msg);
-            u.lang = 'es-ES'; u.pitch = 0.5;
-            window.speechSynthesis.speak(u);
-        }
-    }
-
-    function reset() {
+        racha++; document.getElementById('streak-val').innerText = racha;
         document.getElementById('b-start').style.display = 'block';
         document.getElementById('mode').style.display = 'block';
         document.getElementById('b-done').style.display = 'none';
         document.getElementById('timer').style.display = 'none';
         document.getElementById('answer-input').style.display = 'none';
         document.getElementById('answer-input').value = "";
-        document.getElementById('msg').innerText = "TAREA LOGRADA. SIGUIENTE.";
+        document.getElementById('msg').innerText = "BIEN. SIGUIENTE.";
+    }
+
+    function muerte(t, msg, time) {
+        let h = JSON.parse(localStorage.getItem('p_f') || "[]");
+        h.unshift({m:t, t:time, d:new Date().toLocaleTimeString()});
+        localStorage.setItem('p_f', JSON.stringify(h.slice(0,20)));
+
+        document.getElementById('d-title').innerText = t;
+        document.getElementById('d-msg').innerText = msg;
+        document.getElementById('death-screen').style.display = 'flex';
+        
+        if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
+        playBeep(100, 2);
+        
+        const u = new SpeechSynthesisUtterance(t + ". " + msg);
+        u.lang = 'es-ES'; u.pitch = 0.1; u.rate = 0.6;
+        window.speechSynthesis.speak(u);
     }
 </script>
 </body>

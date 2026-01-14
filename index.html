@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PREDICADOR OS | ATMOSPHERE</title>
+    <title>PREDICADOR OS | EL JUEZ</title>
     <style>
         :root { --main: #00ff41; --fail: #ff0000; --bg: #000; --gold: #ffd700; }
         body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 15px; text-transform: uppercase; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; transition: 0.8s; }
@@ -25,7 +25,7 @@
 <body>
 
 <div id="death-screen">
-    <h1 style="font-size: 3rem; margin:0;">ERROR</h1>
+    <h1 id="d-title" style="font-size: 3rem; margin:0;">ERROR</h1>
     <p id="d-msg" style="font-weight: 900; padding: 20px;"></p>
     <button class="btn" style="background:#000; color:#fff; width: 80%; border: 3px solid #fff;" onclick="location.reload()">REINTENTAR</button>
 </div>
@@ -62,7 +62,6 @@
 
     const clickSound = () => playSound(900, 0.02);
 
-    // MÚSICA DE FONDO (Dark Drone)
     const startBackgroundMusic = () => {
         if(musicStarted) return;
         musicStarted = true;
@@ -70,7 +69,7 @@
         const g = aCtx.createGain();
         o1.type = 'sawtooth'; o1.frequency.setValueAtTime(40, aCtx.currentTime);
         o2.type = 'sine'; o2.frequency.setValueAtTime(42, aCtx.currentTime);
-        g.gain.setValueAtTime(0.015, aCtx.currentTime); // Volumen bajo
+        g.gain.setValueAtTime(0.015, aCtx.currentTime);
         o1.connect(g); o2.connect(g); g.connect(aCtx.destination);
         o1.start(); o2.start();
     };
@@ -78,7 +77,13 @@
     const db = {
         FISICO: ["100 Flexiones", "50 Burpees", "3 Min Plancha", "80 Sentadillas", "100 Mountain Climbers", "4 Min Wall Sit"],
         SANTIDAD: ["Ducha Agua Helada", "1 Hora Sin Móvil", "Limpiar Habitación Ya", "Ayuno Dopamina", "Cero Azúcar Hoy"],
-        MENTAL: [{q:"7 X 8 X 2", a:"112"}, {q:"RAÍZ 225", a:"15"}, {q:"SIMBOLO ORO", a:"AU"}]
+        MENTAL: [
+            {q:"7 X 8 X 2", a:"112"}, 
+            {q:"RAÍZ 225", a:"15"}, 
+            {q:"ORO (SIMBOLO)", a:"AU"},
+            {q:"12 X 12", a:"144"},
+            {q:"SIMBOLO PLATA", a:"AG"}
+        ]
     };
 
     window.onload = () => {
@@ -102,9 +107,11 @@
             qA = db.MENTAL[Math.floor(Math.random()*db.MENTAL.length)];
             document.getElementById('msg').innerText = qA.q;
             document.getElementById('answer-input').style.display = 'block';
+            document.getElementById('answer-input').value = "";
             document.getElementById('answer-input').focus();
         } else {
             document.getElementById('msg').innerText = db[m][Math.floor(Math.random()*db[m].length)];
+            document.getElementById('answer-input').style.display = 'none';
         }
 
         intv = setInterval(() => {
@@ -119,21 +126,39 @@
         const sTotal = (Date.now() - tInicio)/1000;
         const mode = document.getElementById('mode').value;
 
-        if(mode !== 'MENTAL' && sTotal < 10) { muerte("MENTIROSO", "DEMASIADO RÁPIDO."); return; }
+        // VALIDACIÓN MENTAL ESTRICTA
+        if(mode === 'MENTAL') {
+            const userAns = document.getElementById('answer-input').value.trim().toUpperCase();
+            if(userAns !== qA.a) {
+                muerte("ERROR MENTAL", "CEREBRO DEFECTUOSO. RESPUESTA INCORRECTA.");
+                return;
+            }
+        } else if(sTotal < 10) {
+            muerte("MENTIROSO", "INTENTASTE ENGAÑAR AL OJO.");
+            return;
+        }
+
+        racha++; 
+        document.getElementById('streak-val').innerText = racha;
         
-        racha++; document.getElementById('streak-val').innerText = racha;
         if(racha >= 5) {
             document.body.classList.add('gold-mode');
             document.getElementById('main-frame').classList.add('gold-border');
+            const u = new SpeechSynthesisUtterance("ERES UN ELEGIDO.");
+            u.pitch = 0.8; window.speechSynthesis.speak(u);
         }
+        
         resetUI();
     }
 
     function muerte(t, msg) {
+        document.getElementById('d-title').innerText = t;
         document.getElementById('d-msg').innerText = msg;
         document.getElementById('death-screen').style.display = 'flex';
         playSound(60, 2, 'sawtooth', 0.5);
         if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
+        const u = new SpeechSynthesisUtterance(t + ". " + msg);
+        u.lang = 'es-ES'; u.pitch = 0.1; window.speechSynthesis.speak(u);
     }
 
     function resetUI() {
@@ -142,7 +167,7 @@
         document.getElementById('b-done').style.display = 'none';
         document.getElementById('timer').style.display = 'none';
         document.getElementById('answer-input').style.display = 'none';
-        document.getElementById('msg').innerText = "TAREA REGISTRADA.";
+        document.getElementById('msg').innerText = "REGISTRADO. SIGUIENTE RETO.";
     }
 
     document.getElementById('answer-input').onkeydown = clickSound;
